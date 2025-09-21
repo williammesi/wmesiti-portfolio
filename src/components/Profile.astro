@@ -1,0 +1,45 @@
+---
+import { Image } from "astro:assets";
+import profilePic from "../assets/profile.webp";
+import { Icon } from 'astro-icon/components'
+
+---
+
+<script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
+<el-dropdown class="inline-block">
+  <!-- <button class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20">
+    Options
+    
+  </button> -->
+
+  <button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder rounded-lg text-mochawhite px-4 py-2  flex flex-row gap-4 items-center cursor-pointer" >
+        <Image class="rounded-full overflow-clip " src={profilePic} alt="Profile Picture" width={50} height={50} />
+        <span class="font-medium text-md" >William Mesiti</span>
+        <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="-mr-1 size-5 text-mochawhite">
+            <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+        </svg>
+  </button>
+  <el-menu anchor="bottom end" popover class="w-56 origin-top-right rounded-md bg-mochasurface outline-1 -outline-offset-1 outline-mochaborder transition transition-discrete [--anchor-gap:--spacing(2)] data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in">
+    <div class="py-1">
+        <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-mesiti-44960b28b/" class="flex flex-row items-center gap-4 px-4 py-2 text-sm text-mochawhite focus:bg-mochasurfacelight/50 focus:outline-hidden">
+            <Icon name="mdi:linkedin" width="25px" height="25px"  style="color: #cdd6f4" />
+            LinkedIn
+        </a>
+        <a target="_blank" rel="noopener noreferrer" href="https://github.com/williammesi" class="flex flex-row items-center gap-4 px-4 py-2 text-sm text-mochawhite focus:bg-mochasurfacelight/50 focus:outline-hidden">
+            <Icon name="mdi:github" width="25px" height="25px"  style="color: #cdd6f4" />
+            Github
+        </a>
+        <a target="_blank" rel="noopener noreferrer" href="mailto:wmesiti.tech@gmail.com" class="flex flex-row items-center gap-4 px-4 py-2 text-sm text-mochawhite focus:bg-mochasurfacelight/50 focus:outline-hidden">
+            <Icon name="mdi:email" width="25px" height="25px"  style="color: #cdd6f4" />
+            Email
+        </a>
+        <a target="_blank" rel="noopener noreferrer" href="tel:+15797301506" class="flex flex-row items-center gap-4 px-4 py-2 text-sm text-mochawhite focus:bg-mochasurfacelight/50 focus:outline-hidden">
+            <Icon name="mdi:phone" width="25px" height="25px"  style="color: #cdd6f4" />
+            Telephone
+        </a>
+        
+      
+      
+    </div>
+  </el-menu>
+</el-dropdown>
