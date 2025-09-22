@@ -1,38 +1,40 @@
 ---
 ---
 
-<div class="skills-tabs grid grid-cols-5 gap-8 p-6">
+<div class="skills-tabs grid grid-cols-5 grid-rows-3 lg:grid-rows-1 gap-8  ">
     <!-- Enhanced Tab Navigation -->
-    <div class="tabs-header flex flex-col gap-3">
-        <h3 class="text-xl font-bold text-mochawhite mb-2">Technologies</h3>
+    <div class="tabs-header flex flex-col col-span-full lg:col-span-1 gap-3">
+        <h3 class="text-xl md:text-2xl font-bold text-center lg:text-start text-mochawhite mb-2">Technologies</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-1 gap-3 my-auto lg:my-0" >
         <button class="tab-button active group relative px-6 py-4 text-mochawhite bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl border border-mochaborder hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 text-left shadow-lg" data-tab="frontend">
             <div class="flex items-center gap-3">
-                <div class="w-2 h-2 bg-white rounded-full opacity-80"></div>
+                <div class="w-2 h-2 bg-white rounded-full"></div>
                 <span class="font-medium">Frontend</span>
             </div>
         </button>
-        <button class="tab-button group relative px-6 py-4 text-mochawhite bg-mochasurface/80 backdrop-blur-sm rounded-xl border border-mochaborder hover:bg-mochasurfacelight hover:scale-105 transition-all duration-300 text-left" data-tab="backend">
+        <button class="tab-button group relative px-6 py-4 text-mochawhite bg-mochasurface backdrop-blur-sm rounded-xl border border-mochaborder hover:bg-mochasurfacelight hover:scale-105 transition-all duration-300 text-left" data-tab="backend">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-2 bg-mochawhite/60 rounded-full"></div>
                 <span class="font-medium">Backend</span>
             </div>
         </button>
-        <button class="tab-button group relative px-6 py-4 text-mochawhite bg-mochasurface/80 backdrop-blur-sm rounded-xl border border-mochaborder hover:bg-mochasurfacelight hover:scale-105 transition-all duration-300 text-left" data-tab="devops">
+        <button class="tab-button group relative px-6 py-4 text-mochawhite bg-mochasurface backdrop-blur-sm rounded-xl border border-mochaborder hover:bg-mochasurfacelight hover:scale-105 transition-all duration-300 text-left" data-tab="devops">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-2 bg-mochawhite/60 rounded-full"></div>
                 <span class="font-medium">DevOps</span>
             </div>
         </button>
-        <button class="tab-button group relative px-6 py-4 text-mochawhite bg-mochasurface/80 backdrop-blur-sm rounded-xl border border-mochaborder hover:bg-mochasurfacelight hover:scale-105 transition-all duration-300 text-left" data-tab="other">
+        <button class="tab-button group relative px-6 py-4 text-mochawhite bg-mochasurface backdrop-blur-sm rounded-xl border border-mochaborder hover:bg-mochasurfacelight hover:scale-105 transition-all duration-300 text-left" data-tab="other">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-2 bg-mochawhite/60 rounded-full"></div>
                 <span class="font-medium">Tools</span>
             </div>
         </button>
+        </div>
     </div>
 
     <!-- Enhanced Tab Content -->
-    <div class="tabs-body col-span-4 bg-mochasurface/50 backdrop-blur-sm rounded-2xl border border-mochaborder p-8 min-h-[300px]">
+    <div class="tabs-body row-span-2 lg:row-span-1 col-span-full lg:col-span-4 bg-mochasurface backdrop-blur-sm rounded-2xl border border-mochaborder p-8 min-h-[300px]">
         <div class="tab-panel active fade-in" data-panel="frontend">
             <div class="mb-6">
                 <h4 class="text-2xl font-bold text-mochawhite mb-2">Frontend Development</h4>

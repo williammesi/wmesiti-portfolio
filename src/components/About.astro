@@ -7,42 +7,67 @@ import { Icon } from 'astro-icon/components'
 const { id } = Astro.props;
 ---
 
-<div id={id} class="grid grid-cols-3 gap-4">
-   <div class="col-span-2 p-8 rounded-tl-4xl rounded-bl-4xl bg-mochasurface border border-mochaborder"> 
-         <div class="text-4xl font-bold mb-4 bg-mochablack text-indigo-300 font-mono p-4 rounded border border-mochaborder">
+<div id={id} class="grid grid-cols-1 2xl:grid-cols-3 gap-4">
+   <div class="col-span-2 order-2 2xl:order-none p-4 md:p-8 rounded-4xl 2xl:rounded-r-none bg-mochasurface border border-mochaborder"> 
+         <div class="text-md md:text-xl lg:text-4xl font-bold mb-4 bg-mochablack text-indigo-300 font-mono p-4 rounded border border-mochaborder">
             &lt;h1&gt;<span class=" text-mochawhite" id="typewriter"></span>&lt;/h1&gt;
          </div>
-         <p class="mb-4 text-lg">Je suis un étudiant de dernière année en DEC technique en informatique passionné par le développement de toutes sortes, mais particulièrement par le développement web fullstack.</p>
-         <p class="mb-4 text-lg">En dehors de l'école, je passe la majorité de mon temps à apprendre de nouvelles technologies et à travailler sur des projets personnels tous aussi originaux les uns que les autres.</p>
-         <p class="mb-4 text-lg">Je suis actuellement à la recherche d'un stage collégial dans le domaine qui me passionne, afin de mettre en pratique mes compétences et d'apprendre auprès des meilleurs de mon domaine.</p>
-         <p class="mb-4 text-lg font-semibold">Si j'ai su attirer votre attention, n'hésitez pas à me contacter !</p>
-         <div class="flex flex-row gap-4">
-            <a href="mailto:wmesiti.tech@gmail.com" target="_blank" rel="noopener noreferrer"  class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
-                <Icon name="mdi:email" width="25px" height="25px"  style="color: #cdd6f4" />
+
+         <!-- Tabs Navigation -->
+         <div class="flex flex-col md:flex-row gap-2 mb-4">
+            <button class="about-tab-button active px-4 py-2 text-mochawhite bg-indigo-600 rounded-lg border border-mochaborder hover:bg-indigo-700 transition-colors" data-tab="presentation">
+               Présentation
+            </button>
+            <button class="about-tab-button px-4 py-2 text-mochawhite bg-mochasurface rounded-lg border border-mochaborder hover:bg-mochasurfacelight transition-colors" data-tab="passtemps">
+               Passe temps
+            </button>
+            <button class="about-tab-button px-4 py-2 text-mochawhite bg-mochasurface rounded-lg border border-mochaborder hover:bg-mochasurfacelight transition-colors" data-tab="objectifs">
+               Objectifs
+            </button>
+         </div>
+
+         <!-- Tabs Content -->
+         <div class="about-tab-content">
+            <div class="about-tab-panel active" data-panel="presentation">
+               <p class="mb-4 text-sm md:text-lg">Je suis un étudiant de dernière année en DEC technique en informatique passionné par le développement de toutes sortes, mais particulièrement par le développement web fullstack.</p>
+            </div>
+            <div class="about-tab-panel hidden" data-panel="passtemps">
+               <p class="mb-4 text-sm md:text-lg">En dehors de l'école, je passe la majorité de mon temps à apprendre de nouvelles technologies et à travailler sur des projets personnels tous aussi originaux les uns que les autres.</p>
+            </div>
+            <div class="about-tab-panel hidden" data-panel="objectifs">
+               <p class="mb-4 text-sm md:text-lg">Je suis actuellement à la recherche d'un stage collégial dans le domaine qui me passionne, afin de mettre en pratique mes compétences et d'apprendre auprès des meilleurs de mon domaine.</p>
+            </div>
+         </div>
+
+         <p class="mb-4 text-md md:text-lg font-semibold">Si j'ai su attirer votre attention, n'hésitez pas à me contacter !</p>
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a href="mailto:wmesiti.tech@gmail.com" target="_blank" rel="noopener noreferrer"  class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-sm md:text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
+                <Icon name="mdi:email" width="20px" height="20px"  style="color: #cdd6f4" />
                 wmesiti.tech@gmail.com
             </a>
-            <a href="tel:(579) 730-1506" target="_blank" rel="noopener noreferrer" class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
-                <Icon name="mdi:phone" width="25px" height="25px"  style="color: #cdd6f4" />
+            <a href="tel:(579) 730-1506" target="_blank" rel="noopener noreferrer" class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-sm md:text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
+                <Icon name="mdi:phone" width="20px" height="20px"  style="color: #cdd6f4" />
                 (579) 730-1506
             </a>
-            <a href="https://www.linkedin.com/in/william-mesiti-44960b28b/" target="_blank" rel="noopener noreferrer"  class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
-                <Icon name="mdi:linkedin" width="25px" height="25px"  style="color: #cdd6f4" />
+            <a href="https://www.linkedin.com/in/william-mesiti-44960b28b/" target="_blank" rel="noopener noreferrer"  class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-sm md:text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
+                <Icon name="mdi:linkedin" width="20px" height="20px"  style="color: #cdd6f4" />
                 LinkedIn
             </a>
-            <a href="https://github.com/williammesi" target="_blank" rel="noopener noreferrer" class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
-                <Icon name="mdi:github" width="25px" height="25px"  style="color: #cdd6f4" />
+            <a href="https://github.com/williammesi" target="_blank" rel="noopener noreferrer" class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-sm md:text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
+                <Icon name="mdi:github" width="20px" height="20px"  style="color: #cdd6f4" />
                 Github
             </a>
          </div>
 
    </div>
-   <div class="p-4 rounded-tr-4xl rounded-br-4xl bg-mochasurface border border-mochaborder" >
+   <div class="order-1 2xl:order-none p-4 rounded-tr-4xl rounded-br-4xl bg-mochasurface border border-mochaborder hidden 2xl:block" >
        <Image class="rounded-tr-4xl rounded-br-4xl" src={profilePic} alt="Profile Picture" width={500} height={500} />
    </div>
 
 </div>
 
 <script>
+   // Typewriter effect
    const text = "Enchanté, moi c'est William !";
    const typewriterElement = document.getElementById("typewriter");
    let i = 0;
@@ -56,4 +81,35 @@ const { id } = Astro.props;
    }
 
    typeWriter();
+
+   // About tabs functionality
+   const aboutTabButtons = document.querySelectorAll('.about-tab-button');
+   const aboutTabPanels = document.querySelectorAll('.about-tab-panel');
+
+   aboutTabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+         const targetTab = (button as HTMLButtonElement).dataset.tab;
+
+         // Remove active class from all buttons and panels
+         aboutTabButtons.forEach(btn => {
+            btn.classList.remove('active', 'bg-indigo-600', 'hover:bg-indigo-700');
+            btn.classList.add('bg-mochasurface', 'hover:bg-mochasurfacelight');
+         });
+
+         aboutTabPanels.forEach(panel => {
+            panel.classList.add('hidden');
+            panel.classList.remove('active');
+         });
+
+         // Add active class to clicked button and corresponding panel
+         button.classList.add('active', 'bg-indigo-600', 'hover:bg-indigo-700');
+         button.classList.remove('bg-mochasurface', 'hover:bg-mochasurfacelight');
+
+         const targetPanel = document.querySelector(`[data-panel="${targetTab}"]`);
+         if (targetPanel) {
+            targetPanel.classList.remove('hidden');
+            targetPanel.classList.add('active');
+         }
+      });
+   });
 </script>
