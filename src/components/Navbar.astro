@@ -5,7 +5,7 @@ import profilePic from "../assets/profile.webp";
 import Profile from './Profile.astro';
 ---
 
-<div class="sticky top-0 w-full z-100 py-4 px-8 border-b border-b-mochaborder flex flex-row justify-between items-center ">
+<div class="sticky top-0 w-full z-100 py-4 px-8 border-b border-b-mochaborder bg-mochablack flex flex-row justify-between items-center ">
 
     <!-- <div class="bg-[#1e1e2e] border border-[#313244] rounded-lg text-mochawhite px-4 py-2  flex flex-row gap-4 items-center" >
         <Image class="rounded-full overflow-clip " src={profilePic} alt="Profile Picture" width={50} height={50} />
@@ -13,9 +13,15 @@ import Profile from './Profile.astro';
     </div> -->
     <Profile />
     <div class="gap-4 flex flex-row">
-        <Button  class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">À propos</Button>
-        <Button  class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Projets</Button>
-        <Button  class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Expérience</Button>
+        <a href="#about">
+            <Button  class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">À propos</Button>
+        </a>
+        <a href="#experience">
+            <Button  class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Expérience</Button>
+        </a>
+        <a href="#projects">
+            <Button  class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Projets</Button>
+        </a>
     </div>
     <div>
         <Button class="bg-mochawhite hover:bg-indigo-200 text-mochablack cursor-pointer">Me contacter</Button>

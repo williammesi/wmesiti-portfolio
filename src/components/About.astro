@@ -3,9 +3,11 @@ import { Image } from "astro:assets";
 import profilePic from "../assets/profile.webp";
 import { Button } from '@/components/ui/button'
 import { Icon } from 'astro-icon/components'
+
+const { id } = Astro.props;
 ---
 
-<div class="grid grid-cols-3 gap-4">
+<div id={id} class="grid grid-cols-3 gap-4">
    <div class="col-span-2 p-8 rounded-tl-4xl rounded-bl-4xl bg-mochasurface border border-mochaborder"> 
          <div class="text-4xl font-bold mb-4 bg-mochablack text-indigo-300 font-mono p-4 rounded border border-mochaborder">
             &lt;h1&gt;<span class=" text-mochawhite" id="typewriter"></span>&lt;/h1&gt;
