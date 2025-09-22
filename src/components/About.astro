@@ -8,26 +8,26 @@ const { id } = Astro.props;
 ---
 
 <div id={id} class="grid grid-cols-1 2xl:grid-cols-3 gap-4">
-   <div class="col-span-2 order-2 2xl:order-none p-4 md:p-8 rounded-4xl 2xl:rounded-r-none bg-mochasurface border border-mochaborder"> 
-         <div class="text-md md:text-xl lg:text-4xl font-bold mb-4 bg-mochablack text-indigo-300 font-mono p-4 rounded border border-mochaborder">
+   <div class="col-span-2 order-2 2xl:order-none p-4 md:p-8 rounded-4xl 2xl:rounded-r-none bg-transparent 2xl:bg-mochasurface border-0 2xl:border-1 2xl:border-mochaborder"> 
+         <div class="text-md md:text-xl lg:text-4xl font-bold mb-4 bg-mochasurface 2xl:bg-mochablack text-indigo-300 font-mono p-4 rounded border border-mochaborder">
             &lt;h1&gt;<span class=" text-mochawhite" id="typewriter"></span>&lt;/h1&gt;
          </div>
 
          <!-- Tabs Navigation -->
-         <div class="flex flex-col md:flex-row gap-2 mb-4">
-            <button class="about-tab-button active px-4 py-2 text-mochawhite bg-indigo-600 rounded-lg border border-mochaborder hover:bg-indigo-700 transition-colors" data-tab="presentation">
+         <div class="flex flex-row gap-0  border-b border-mochaborder">
+            <button class="text-sm md:text-lg about-tab-button active px-2 md:px-4 py-2 text-indigo-300 border-b-2 border-indigo-300 hover:text-indigo-400 hover:border-indigo-400 transition-colors bg-transparent" data-tab="presentation">
                Présentation
             </button>
-            <button class="about-tab-button px-4 py-2 text-mochawhite bg-mochasurface rounded-lg border border-mochaborder hover:bg-mochasurfacelight transition-colors" data-tab="passtemps">
+            <button class="text-sm md:text-lg about-tab-button px-2 py-2 md:px-4 text-mochawhite border-b-2 border-transparent hover:text-indigo-300 hover:border-indigo-300 transition-colors bg-transparent" data-tab="passtemps">
                Passe temps
             </button>
-            <button class="about-tab-button px-4 py-2 text-mochawhite bg-mochasurface rounded-lg border border-mochaborder hover:bg-mochasurfacelight transition-colors" data-tab="objectifs">
+            <button class="text-sm md:text-lg about-tab-button px-2 py-2 md:px-4 text-mochawhite border-b-2 border-transparent hover:text-indigo-300 hover:border-indigo-300 transition-colors bg-transparent" data-tab="objectifs">
                Objectifs
             </button>
          </div>
 
          <!-- Tabs Content -->
-         <div class="about-tab-content">
+         <div class="about-tab-content bg-mochasurface 2xl:bg-mochablack p-4 rounded-b-xl border  border-mochaborder  border-t-0 mb-4">
             <div class="about-tab-panel active" data-panel="presentation">
                <p class="mb-4 text-sm md:text-lg">Je suis un étudiant de dernière année en DEC technique en informatique passionné par le développement de toutes sortes, mais particulièrement par le développement web fullstack.</p>
             </div>
@@ -92,8 +92,8 @@ const { id } = Astro.props;
 
          // Remove active class from all buttons and panels
          aboutTabButtons.forEach(btn => {
-            btn.classList.remove('active', 'bg-indigo-600', 'hover:bg-indigo-700');
-            btn.classList.add('bg-mochasurface', 'hover:bg-mochasurfacelight');
+            btn.classList.remove('active', 'text-indigo-300', 'border-indigo-300');
+            btn.classList.add('text-mochawhite', 'border-transparent');
          });
 
          aboutTabPanels.forEach(panel => {
@@ -102,8 +102,8 @@ const { id } = Astro.props;
          });
 
          // Add active class to clicked button and corresponding panel
-         button.classList.add('active', 'bg-indigo-600', 'hover:bg-indigo-700');
-         button.classList.remove('bg-mochasurface', 'hover:bg-mochasurfacelight');
+         button.classList.add('active', 'text-indigo-300', 'border-indigo-300');
+         button.classList.remove('text-mochawhite', 'border-transparent');
 
          const targetPanel = document.querySelector(`[data-panel="${targetTab}"]`);
          if (targetPanel) {
