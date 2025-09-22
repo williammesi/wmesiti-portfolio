@@ -1,11 +1,15 @@
 ---
 ---
 
-<div class="skills-tabs grid grid-cols-5 grid-rows-3 lg:grid-rows-1 gap-8  ">
+<div class="skills-tabs flex flex-col lg:grid lg:grid-cols-5 gap-8">
     <!-- Enhanced Tab Navigation -->
-    <div class="tabs-header flex flex-col col-span-full lg:col-span-1 gap-3">
-        <h3 class="text-xl md:text-2xl font-bold text-center lg:text-start text-mochawhite mb-2">Technologies</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-1 gap-3 my-auto lg:my-0" >
+    <div class="tabs-header flex flex-col lg:col-span-1 gap-3">
+        <div>
+            <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2 text-center ">Technologies</h2>
+            <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-1 gap-3 my-auto lg:my-0">
         <button class="tab-button active group relative px-6 py-4 text-mochawhite bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl border border-mochaborder hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 text-left shadow-lg" data-tab="frontend">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-2 bg-white rounded-full"></div>
@@ -34,7 +38,7 @@
     </div>
 
     <!-- Enhanced Tab Content -->
-    <div class="tabs-body row-span-2 lg:row-span-1 col-span-full lg:col-span-4 bg-mochasurface backdrop-blur-sm rounded-2xl border border-mochaborder p-8 min-h-[300px]">
+    <div class="tabs-body lg:col-span-4 bg-mochasurface backdrop-blur-sm rounded-2xl border border-mochaborder p-8 min-h-[400px] flex-1">
         <div class="tab-panel active fade-in" data-panel="frontend">
             <div class="mb-6">
                 <h4 class="text-2xl font-bold text-mochawhite mb-2">Frontend Development</h4>
@@ -210,7 +214,7 @@
             tabButtons.forEach(btn => {
                 btn.classList.remove('active');
                 btn.classList.remove('bg-gradient-to-r', 'from-indigo-600', 'to-purple-600', 'hover:from-indigo-700', 'hover:to-purple-700', 'shadow-lg');
-                btn.classList.add('bg-mochasurface/80', 'backdrop-blur-sm', 'hover:bg-mochasurfacelight', 'hover:scale-105');
+                btn.classList.add('bg-mochasurface', 'backdrop-blur-sm', 'hover:bg-mochasurfacelight', 'hover:scale-105');
                 
                 // Reset dot color
                 const dot = btn.querySelector('.w-2.h-2');
@@ -228,7 +232,7 @@
 
             // Activate clicked button
             button.classList.add('active');
-            button.classList.remove('bg-mochasurface/80', 'backdrop-blur-sm', 'hover:bg-mochasurfacelight', 'hover:scale-105');
+            button.classList.remove('bg-mochasurface', 'backdrop-blur-sm', 'hover:bg-mochasurfacelight', 'hover:scale-105');
             button.classList.add('bg-gradient-to-r', 'from-indigo-600', 'to-purple-600', 'hover:from-indigo-700', 'hover:to-purple-700', 'shadow-lg');
             
             // Update dot color
