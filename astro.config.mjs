@@ -18,10 +18,11 @@ export default defineConfig({
     icon(),
     react(),
     sanity({
-      projectId: "wmesiti-portfolio-cms",
-      dataset: "wmesiti-portfolio-data",
+      projectId: "9bdbnjzy",
+      dataset: "production",
       // Set useCdn to false if you're building statically.
       useCdn: false,
+      studioBasePath: "/admin",
     }),
   ],
   // Removed webcore() since the package doesn't exist
