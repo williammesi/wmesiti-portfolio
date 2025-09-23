@@ -1,0 +1,358 @@
+---
+import { createClient } from "@sanity/client";
+import { Icon } from 'astro-icon/components';
+
+// Accept project slug as props
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+
+// Initialize Sanity client
+const client = createClient({
+  projectId: "9bdbnjzy",
+  dataset: "production",
+  useCdn: false,
+  apiVersion: "2023-01-01",
+});
+
+// Project interface based on schema
+interface Project {
+  _id: string;
+  title: string;
+  slug: {
+    current: string;
+  };
+  summary: string;
+  description: string;
+  status: 'completed' | 'inProgress';
+  year: number;
+  thumbnail: {
+    asset: {
+      _ref: string;
+    };
+    alt?: string;
+  };
+  image1?: {
+    asset: {
+      _ref: string;
+    };
+    alt?: string;
+  };
+  image2?: {
+    asset: {
+      _ref: string;
+    };
+    alt?: string;
+  };
+  image3?: {
+    asset: {
+      _ref: string;
+    };
+    alt?: string;
+  };
+  technologies: string[];
+  features?: Array<{
+    name: string;
+    description: string;
+    image?: {
+      asset: {
+        _ref: string;
+      };
+    };
+  }>;
+  challenges?: Array<{
+    challengeName: string;
+    challengeDescription: string;
+    solutionName: string;
+    solutionDescription: string;
+  }>;
+  githubUrl?: string;
+  liveUrl?: string;
+  featured: boolean;
+  order?: number;
+}
+
+// Fetch project by slug
+const project: Project = await client.fetch(`
+  *[_type == "project" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    summary,
+    description,
+    status,
+    year,
+    thumbnail,
+    image1,
+    image2,
+    image3,
+    technologies,
+    features,
+    challenges,
+    githubUrl,
+    liveUrl,
+    featured,
+    order
+  }
+`, { slug });
+
+// Helper function to get image URL from Sanity
+function getImageUrl(imageRef: string): string {
+  return `https://cdn.sanity.io/images/9bdbnjzy/production/${imageRef.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`;
+}
+
+// Get all available images for carousel
+const images = [
+  project.image1 && {
+    url: getImageUrl(project.image1.asset._ref),
+    alt: project.image1.alt || `${project.title} - Image 1`
+  },
+  project.image2 && {
+    url: getImageUrl(project.image2.asset._ref),
+    alt: project.image2.alt || `${project.title} - Image 2`
+  },
+  project.image3 && {
+    url: getImageUrl(project.image3.asset._ref),
+    alt: project.image3.alt || `${project.title} - Image 3`
+  }
+].filter(Boolean);
+
+// Status styling
+const statusStyles = {
+  completed: "bg-green-500/20 text-green-400 border-green-500/30",
+  inProgress: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+};
+
+const statusLabels = {
+  completed: "Complété",
+  inProgress: "En cours"
+};
+
+if (!project) {
+  return new Response(null, { status: 404 });
+}
+---
+
+<div class="w-full max-w-6xl mx-auto p-4 space-y-8">
+  <!-- Header Section -->
+  <div class="bg-mochasurface border border-mochaborder rounded-4xl p-6 md:p-8">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl md:text-4xl font-bold text-mochawhite mb-2">{project.title}</h1>
+        <p class="text-lg text-mochawhite/80 mb-4">{project.description}</p>
+      </div>
+      <div class="flex flex-col gap-2">
+        <span class={`px-3 py-1 rounded-md text-sm border self-start ${statusStyles[project.status]}`}>
+          {statusLabels[project.status]}
+        </span>
+        <span class="text-sm text-mochawhite/50">{project.year}</span>
+      </div>
+    </div>
+
+    <!-- Technologies -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      {project.technologies.map((tech) => (
+        <span class="px-3 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-sm">
+          {tech}
+        </span>
+      ))}
+    </div>
+
+    <!-- Action Links -->
+    {(project.githubUrl || project.liveUrl) && (
+      <div class="flex flex-wrap gap-4">
+        {project.githubUrl && (
+          <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
+             class="flex items-center gap-2 px-4 py-2 bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder rounded-lg text-mochawhite transition-colors">
+            <Icon name="mdi:github" width="20" height="20" />
+            Code Source
+          </a>
+        )}
+        {project.liveUrl && (
+          <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
+             class="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 border border-indigo-500 rounded-lg text-white transition-colors">
+            <Icon name="mdi:open-in-new" width="20" height="20" />
+            Voir le Projet
+          </a>
+        )}
+      </div>
+    )}
+  </div>
+
+  <!-- Image Carousel -->
+  {images.length > 0 && (
+    <div class="bg-mochasurface border border-mochaborder rounded-4xl p-6 md:p-8">
+      <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-6">Images du Projet</h2>
+
+      <div class="relative">
+        <!-- Carousel Container -->
+        <div class="carousel-container overflow-hidden rounded-2xl">
+          <div class="carousel-track flex transition-transform duration-300 ease-in-out" id="carousel-track">
+            {images.map((image, index) => (
+              <div class="carousel-slide w-full flex-shrink-0">
+                <img src={image.url} alt={image.alt}
+                     class="w-full h-96 md:h-[500px] object-fit bg-mochablack rounded-2xl" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Navigation Arrows -->
+        {images.length > 1 && (
+          <>
+            <button class="carousel-prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-mochasurface/80 hover:bg-mochasurface border border-mochaborder rounded-full p-2 text-mochawhite transition-colors"
+                    id="carousel-prev">
+              <Icon name="mdi:chevron-left" width="24" height="24" />
+            </button>
+            <button class="carousel-next absolute right-4 top-1/2 transform -translate-y-1/2 bg-mochasurface/80 hover:bg-mochasurface border border-mochaborder rounded-full p-2 text-mochawhite transition-colors"
+                    id="carousel-next">
+              <Icon name="mdi:chevron-right" width="24" height="24" />
+            </button>
+          </>
+        )}
+
+        <!-- Navigation Dots -->
+        {images.length > 1 && (
+          <div class="flex justify-center gap-2 mt-6">
+            {images.map((_, index) => (
+              <button class={`carousel-dot w-3 h-3 rounded-full border border-mochaborder transition-colors ${
+                index === 0 ? 'bg-indigo-400' : 'bg-mochasurface hover:bg-mochasurfacelight'
+              }`} data-slide={index}>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+
+  <!-- Features Section -->
+  {project.features && project.features.length > 0 && (
+    <div class="bg-mochasurface border border-mochaborder rounded-4xl p-6 md:p-8">
+      <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-6">Fonctionnalités</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {project.features.map((feature) => (
+          <div class="bg-mochasurface border border-mochaborder rounded-2xl p-6 hover:bg-mochasurfacelight/50 transition-colors">
+            {feature.image && (
+              <div class="w-12 h-12 mb-4">
+                <img src={getImageUrl(feature.image.asset._ref)} alt={feature.name}
+                     class="w-full h-full object-contain" />
+              </div>
+            )}
+            <h3 class="text-lg font-semibold text-mochawhite mb-2">{feature.name}</h3>
+            <p class="text-mochawhite/70 text-sm">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- Challenges & Solutions Section -->
+  {project.challenges && project.challenges.length > 0 && (
+    <div class="bg-mochasurface border border-mochaborder rounded-4xl p-6 md:p-8">
+      <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-6">Défis & Solutions</h2>
+
+      <div class="space-y-6">
+        {project.challenges.map((challenge, index) => (
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Challenge Card -->
+            <div class="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <Icon name="mdi:alert-circle" width="20" height="20" class="text-red-400" />
+                <h3 class="text-lg font-semibold text-red-300">Défi</h3>
+              </div>
+              <h4 class="font-medium text-mochawhite mb-2">{challenge.challengeName}</h4>
+              <p class="text-mochawhite/70 text-sm">{challenge.challengeDescription}</p>
+            </div>
+
+            <!-- Solution Card -->
+            <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <Icon name="mdi:check-circle" width="20" height="20" class="text-green-400" />
+                <h3 class="text-lg font-semibold text-green-300">Solution</h3>
+              </div>
+              <h4 class="font-medium text-mochawhite mb-2">{challenge.solutionName}</h4>
+              <p class="text-mochawhite/70 text-sm">{challenge.solutionDescription}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
+<script>
+  // Carousel functionality
+  const track = document.getElementById('carousel-track');
+  const prevButton = document.getElementById('carousel-prev');
+  const nextButton = document.getElementById('carousel-next');
+  const dots = document.querySelectorAll('.carousel-dot');
+
+  if (track && dots.length > 1) {
+    let currentSlide = 0;
+    const totalSlides = dots.length;
+
+    function updateCarousel() {
+      const translateX = -currentSlide * 100;
+      track.style.transform = `translateX(${translateX}%)`;
+
+      // Update dots
+      dots.forEach((dot, index) => {
+        if (index === currentSlide) {
+          dot.classList.remove('bg-mochasurface', 'hover:bg-mochasurfacelight');
+          dot.classList.add('bg-indigo-400');
+        } else {
+          dot.classList.remove('bg-indigo-400');
+          dot.classList.add('bg-mochasurface', 'hover:bg-mochasurfacelight');
+        }
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateCarousel();
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+    }
+
+    // Event listeners
+    nextButton?.addEventListener('click', nextSlide);
+    prevButton?.addEventListener('click', prevSlide);
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        currentSlide = index;
+        updateCarousel();
+      });
+    });
+
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
+    });
+  }
+</script>
+
+<style>
+  .carousel-slide {
+    min-width: 100%;
+  }
+
+  .carousel-track {
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-track {
+      transition: none;
+    }
+  }
+</style>

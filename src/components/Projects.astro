@@ -16,6 +16,9 @@ const client = createClient({
 interface Project {
   _id: string;
   title: string;
+  slug: {
+    current: string;
+  };
   summary: string;
   status: 'completed' | 'inProgress';
   year: number;
@@ -35,6 +38,7 @@ const projects: Project[] = await client.fetch(`
   *[_type == "project"] | order(coalesce(order, 999) asc, _createdAt desc) {
     _id,
     title,
+    slug,
     summary,
     status,
     year,
