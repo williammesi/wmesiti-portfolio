@@ -29,6 +29,6 @@ export default defineConfig({
       studioBasePath: "/admin",
     }),
   ],
-
-  adapter: vercel()
+  output: "server",
+  adapter: vercel(),
 });
