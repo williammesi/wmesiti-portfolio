@@ -1,27 +1,167 @@
 ---
 import Navbar from "../components/Navbar.astro";
+import SEO from "../components/SEO.astro";
+import type { SEOProps } from "@/types/sanity";
 import "../styles/global.css";
 
+interface Props extends SEOProps {
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  url,
+  type,
+  noindex,
+  bodyClass = ""
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>William's Portfolio</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<!-- SEO Component with all meta tags -->
+		<SEO
+			title={title}
+			description={description}
+			image={image}
+			url={url}
+			type={type}
+			noindex={noindex}
+			canonical={Astro.url.href}
+		/>
+
+		<!-- Fonts with optimized loading -->
+		<link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+		<noscript>
+			<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+		</noscript>
+
+		<!-- Performance optimizations -->
+		<link rel="modulepreload" href="/src/lib/sanity.ts" />
+
+		<!-- Web App Manifest -->
+		<link rel="manifest" href="/site.webmanifest" />
+
+		<!-- Critical CSS inlined in SEO component -->
 	</head>
-	<body class="m-0 w-full h-full font-[montserrat] bg-mochablack text-mochawhite">
+	<body class={`m-0 w-full h-full font-[montserrat] bg-mochablack text-mochawhite ${bodyClass}`}>
+		<!-- Skip to main content for accessibility -->
+		<a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
 		<Navbar />
-		<slot />
+
+		<main id="main-content" class="main-content">
+			<slot />
+		</main>
+
+		<!-- Performance monitoring script -->
+		<script>
+			// Web Vitals monitoring
+			if ('performance' in window && 'PerformanceObserver' in window) {
+				// Core Web Vitals
+				import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+					getCLS(console.log);
+					getFID(console.log);
+					getFCP(console.log);
+					getLCP(console.log);
+					getTTFB(console.log);
+				}).catch(() => {
+					// Graceful fallback if web-vitals is not available
+					console.debug('Web Vitals monitoring not available');
+				});
+			}
+
+			// Service Worker registration (if available)
+			if ('serviceWorker' in navigator && import.meta.env.PROD) {
+				window.addEventListener('load', () => {
+					navigator.serviceWorker.register('/sw.js')
+						.then(registration => {
+							console.debug('SW registered: ', registration);
+						})
+						.catch(registrationError => {
+							console.debug('SW registration failed: ', registrationError);
+						});
+				});
+			}
+		</script>
 	</body>
 </html>
 
 <style>
+	/* Skip link for accessibility */
+	.skip-link {
+		position: absolute;
+		top: -40px;
+		left: 6px;
+		background: #000;
+		color: #fff;
+		padding: 8px;
+		text-decoration: none;
+		border-radius: 4px;
+		z-index: 1000;
+		font-size: 14px;
+		font-weight: 500;
+	}
 
+	.skip-link:focus {
+		top: 6px;
+	}
+
+	/* Main content area */
+	.main-content {
+		min-height: calc(100vh - 80px); /* Adjust based on navbar height */
+	}
+
+	/* Performance optimization: prevent layout shift */
+	body {
+		font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'pnum' 1, 'tnum' 0, 'onum' 1, 'lnum' 0, 'dlig' 0;
+		text-rendering: optimizeSpeed;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	/* Improved focus management */
+	:focus-visible {
+		outline: 2px solid #6366f1;
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+
+	/* Smooth scrolling for better UX */
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
+	/* High contrast mode support */
+	@media (prefers-contrast: high) {
+		body {
+			background: #000;
+			color: #fff;
+		}
+	}
+
+	/* Print styles */
+	@media print {
+		.skip-link,
+		nav {
+			display: none;
+		}
+
+		body {
+			background: white;
+			color: black;
+		}
+
+		.main-content {
+			min-height: auto;
+		}
+	}
 </style>

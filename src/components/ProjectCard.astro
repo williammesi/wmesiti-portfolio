@@ -1,5 +1,5 @@
 ---
-import { createClient } from "@sanity/client";
+import { PROJECT_STATUS } from '@/types/sanity';
 
 // Accept project data as props
 interface Props {
@@ -24,27 +24,11 @@ interface Props {
 
 const { project } = Astro.props;
 
-// Initialize Sanity client for image URLs
-const client = createClient({
-  projectId: "9bdbnjzy",
-  dataset: "production",
-  useCdn: false,
-  apiVersion: "2023-01-01",
-});
-
-// Get image URL from Sanity
+// Get image URL from Sanity (legacy format that works)
 const thumbnailUrl = `https://cdn.sanity.io/images/9bdbnjzy/production/${project.thumbnail.asset._ref.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`;
 
-// Status styling
-const statusStyles = {
-  completed: "bg-green-500/20 text-green-400 border-green-500/30",
-  inProgress: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-};
-
-const statusLabels = {
-  completed: "Complété",
-  inProgress: "En cours"
-};
+// Status configuration from types
+const statusConfig = PROJECT_STATUS[project.status];
 ---
 
 <a href={`/projects/${project.slug.current}`} class="block">
@@ -55,8 +39,8 @@ const statusLabels = {
       <div class="flex gap-2 justify-center items-center mb-2">
         <h3 class="text-lg text-center font-semibold text-mochawhite">{project.title}</h3>
 
-          <span class={`px-2 py-1 rounded-md text-xs border ${statusStyles[project.status]}`}>
-            {statusLabels[project.status]}
+          <span class={`px-2 py-1 rounded-md text-xs border ${statusConfig.className}`}>
+            {statusConfig.label}
           </span>
           <span class="text-xs text-mochawhite/50">{project.year}</span>
 
@@ -74,3 +58,4 @@ const statusLabels = {
     </div>
   </div>
 </a>
+

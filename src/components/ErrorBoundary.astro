@@ -1,0 +1,236 @@
+---
+import type { ApiError } from '@/types/sanity';
+
+interface Props {
+  error?: ApiError;
+  fallback?: string;
+  showDetails?: boolean;
+  onRetry?: () => void;
+}
+
+const {
+  error,
+  fallback = "Une erreur s'est produite lors du chargement de ce contenu.",
+  showDetails = !import.meta.env.PROD,
+  onRetry
+} = Astro.props;
+
+const isDev = !import.meta.env.PROD;
+---
+
+<div class="error-boundary">
+  <div class="error-content">
+    <!-- Error Icon -->
+    <div class="error-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+        <path d="m15 9-6 6" stroke="currentColor" stroke-width="2"/>
+        <path d="m9 9 6 6" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <!-- Main Error Message -->
+    <h3 class="error-title">Oops ! Quelque chose s'est mal passé</h3>
+    <p class="error-message">{fallback}</p>
+
+    <!-- Error Details (Development Only) -->
+    {showDetails && error && (
+      <details class="error-details">
+        <summary class="error-details-summary">Détails techniques</summary>
+        <div class="error-details-content">
+          <p><strong>Message:</strong> {error.message}</p>
+          {error.code && <p><strong>Code:</strong> {error.code}</p>}
+          {error.details && (
+            <div>
+              <strong>Détails:</strong>
+              <pre class="error-stack">{JSON.stringify(error.details, null, 2)}</pre>
+            </div>
+          )}
+        </div>
+      </details>
+    )}
+
+    <!-- Action Buttons -->
+    <div class="error-actions">
+      {onRetry && (
+        <button class="retry-button" onclick="window.location.reload()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 3v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 21v-5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Réessayer
+        </button>
+      )}
+
+      <a href="/" class="home-button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Retour à l'accueil
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-boundary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    padding: 2rem;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 1rem;
+    margin: 1rem 0;
+  }
+
+  .error-content {
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .error-icon {
+    color: #ef4444;
+    margin-bottom: 1rem;
+  }
+
+  .error-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fecaca;
+    margin-bottom: 0.5rem;
+  }
+
+  .error-message {
+    color: #fca5a5;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .error-details {
+    text-align: left;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .error-details-summary {
+    font-weight: 500;
+    color: #fecaca;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .error-details-summary:hover {
+    color: #fee2e2;
+  }
+
+  .error-details-content {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: #fca5a5;
+  }
+
+  .error-details-content p {
+    margin-bottom: 0.5rem;
+  }
+
+  .error-stack {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    overflow-x: auto;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .retry-button,
+  .home-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+
+  .retry-button {
+    background: #ef4444;
+    color: white;
+  }
+
+  .retry-button:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+  }
+
+  .home-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fecaca;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .home-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fee2e2;
+    transform: translateY(-1px);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .error-boundary {
+      padding: 1rem;
+      margin: 0.5rem 0;
+    }
+
+    .error-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .retry-button,
+    .home-button {
+      justify-content: center;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .retry-button:hover,
+    .home-button:hover {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .error-boundary {
+      border: 2px solid #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .retry-button,
+    .home-button {
+      border: 2px solid currentColor;
+    }
+  }
+</style>

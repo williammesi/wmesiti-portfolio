@@ -1,60 +1,39 @@
 ---
 import ProjectCard from './ProjectCard.astro';
-import { createClient } from "@sanity/client";
+import ErrorBoundary from './ErrorBoundary.astro';
+import { sanityFetch, queries } from '@/lib/sanity';
+import { safeAsync, fallbackData } from '@/utils/errorHandling';
+import type { Project } from '@/types/sanity';
 
 const { id } = Astro.props;
 
-// Initialize Sanity client
-const client = createClient({
-  projectId: "9bdbnjzy",
-  dataset: "production",
-  useCdn: false,
-  apiVersion: "2023-01-01",
-});
+// Fetch projects with error handling and fallback
+const projects: Project[] = await safeAsync(
+  () => sanityFetch<Project[]>(queries.projects),
+  fallbackData.projects
+);
 
-// Project interface
-interface Project {
-  _id: string;
-  title: string;
-  slug: {
-    current: string;
-  };
-  summary: string;
-  status: 'completed' | 'inProgress';
-  year: number;
-  thumbnail: {
-    asset: {
-      _ref: string;
-    };
-    alt?: string;
-  };
-  technologies: string[];
-  featured: boolean;
-  order?: number;
-}
-
-// Fetch projects from Sanity
-const projects: Project[] = await client.fetch(`
-  *[_type == "project"] | order(coalesce(order, 999) asc, _createdAt desc) {
-    _id,
-    title,
-    slug,
-    summary,
-    status,
-    year,
-    thumbnail,
-    technologies,
-    featured,
-    order
-  }
-`);
+// Log performance for monitoring
+console.debug(`[Projects] Loaded ${projects.length} projects`);
 ---
-<div id={id} class="">
-    <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2 text-center">Projets</h2>
-    <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
-        {projects.map((project) => (
-            <ProjectCard project={project} />
-        ))}
-    </div>
-</div>
+<section id={id} class="projects-section">
+    <header class="section-header">
+        <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2 text-center">Projets</h2>
+        <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
+    </header>
+
+    {projects.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-4" role="list">
+            {projects.map((project) => (
+                <div role="listitem">
+                    <ProjectCard project={project} />
+                </div>
+            ))}
+        </div>
+    ) : (
+        <ErrorBoundary
+            fallback="Aucun projet disponible pour le moment."
+            showDetails={false}
+        />
+    )}
+</section>

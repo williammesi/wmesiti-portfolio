@@ -1,0 +1,149 @@
+---
+import type { SEOProps } from '@/types/sanity';
+
+interface Props extends SEOProps {
+  canonical?: string;
+}
+
+const {
+  title = "William's Portfolio",
+  description = "Portfolio de William Mesiti - Développeur Full Stack passionné par les technologies modernes",
+  image = "/og-image.jpg",
+  url = Astro.url.href,
+  canonical = Astro.url.href,
+  type = "website",
+  noindex = false
+} = Astro.props;
+
+// Site configuration
+const siteName = "William's Portfolio";
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || "https://wmesiti-portfolio.vercel.app";
+
+// Construct full URLs
+const fullImageUrl = image.startsWith('http') ? image : `${siteUrl}${image}`;
+const fullCanonicalUrl = canonical.startsWith('http') ? canonical : `${siteUrl}${canonical}`;
+
+// Generate structured data
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": type === "article" ? "Article" : "WebSite",
+  "name": title,
+  "description": description,
+  "url": fullCanonicalUrl,
+  "image": fullImageUrl,
+  "author": {
+    "@type": "Person",
+    "name": "William Mesiti",
+    "url": siteUrl,
+    "jobTitle": "Développeur Full Stack",
+    "sameAs": [
+      "https://github.com/wmesiti",
+      "https://linkedin.com/in/wmesiti"
+    ]
+  },
+  ...(type === "website" && {
+    "publisher": {
+      "@type": "Person",
+      "name": "William Mesiti"
+    }
+  })
+};
+---
+
+<!-- Primary Meta Tags -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<meta name="author" content="William Mesiti" />
+<meta name="generator" content={Astro.generator} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={fullCanonicalUrl} />
+
+<!-- Robots -->
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={url} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={fullImageUrl} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="fr_FR" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={url} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={fullImageUrl} />
+<meta name="twitter:creator" content="@wmesiti" />
+
+<!-- Additional Meta Tags -->
+<meta name="theme-color" content="#181825" />
+<meta name="msapplication-TileColor" content="#181825" />
+
+<!-- Preconnect to external domains -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://cdn.sanity.io" />
+
+<!-- DNS Prefetch -->
+<link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+<link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+<link rel="dns-prefetch" href="https://cdn.sanity.io" />
+
+<!-- Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+<!-- Additional SEO optimizations -->
+<meta name="format-detection" content="telephone=no" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<!-- Favicons -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+
+<!-- Performance Hints -->
+<link rel="preload" href="/fonts/montserrat-variable.woff2" as="font" type="font/woff2" crossorigin />
+
+<style>
+  /* Critical CSS for better perceived performance */
+  html {
+    font-family: 'Montserrat', system-ui, sans-serif;
+    scroll-behavior: smooth;
+    scroll-padding-top: 8rem;
+  }
+
+  body {
+    margin: 0;
+    background-color: #181825;
+    color: #cdd6f4;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prevent layout shift */
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Critical loading styles */
+  .loading {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .loading.loaded {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>

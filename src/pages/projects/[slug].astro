@@ -1,34 +1,40 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProjectDetail from '../../components/ProjectDetail.astro';
-import { createClient } from "@sanity/client";
+import { sanityFetch, queries } from '@/lib/sanity';
+import { safeAsync } from '@/utils/errorHandling';
+import type { Project } from '@/types/sanity';
 
 // Get all project slugs for static generation
 export async function getStaticPaths() {
-  // Initialize Sanity client inside getStaticPaths
-  const client = createClient({
-    projectId: "9bdbnjzy",
-    dataset: "production",
-    useCdn: false,
-    apiVersion: "2023-01-01",
-  });
+  const projects = await safeAsync(
+    () => sanityFetch<{ slug: string }[]>(queries.projectSlugs),
+    []
+  );
 
-  const projects = await client.fetch(`
-    *[_type == "project"] {
-      "slug": slug.current
-    }
-  `);
-
-  return projects.map((project: { slug: string }) => ({
+  return projects.map((project) => ({
     params: { slug: project.slug },
     props: { slug: project.slug }
   }));
 }
 
 const { slug } = Astro.params;
+
+// Fetch project data for SEO
+const project = await safeAsync(
+  () => sanityFetch<Project>(queries.projectBySlug, { slug }),
+  null
+);
+
+// SEO data for project page
+const seoData = project ? {
+  title: `${project.title} - William's Portfolio`,
+  description: project.summary || project.description?.substring(0, 160),
+  type: "article" as const,
+} : undefined;
 ---
 
-<Layout>
+<Layout {...seoData}>
   <div class="w-full lg:w-9/10 mx-auto">
     <!-- Back Navigation -->
     <div class="p-4 mb-4">
