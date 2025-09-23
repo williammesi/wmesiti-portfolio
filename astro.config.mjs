@@ -114,7 +114,6 @@ export default defineConfig({
   output: "server",
   adapter: vercel({
     // Vercel adapter optimizations
-    includeFiles: ["./src/lib/**/*"],
     webAnalytics: {
       enabled: true,
     },
