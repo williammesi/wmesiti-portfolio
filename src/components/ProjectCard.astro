@@ -1,19 +1,71 @@
 ---
-import Image from "astro/components/Image.astro";
-import formbuilder_thumbnail from "../assets/projects/formbuilder_thumbnail.png";
+import { createClient } from "@sanity/client";
+
+// Accept project data as props
+interface Props {
+  project: {
+    _id: string;
+    title: string;
+    summary: string;
+    status: 'completed' | 'inProgress';
+    year: number;
+    thumbnail: {
+      asset: {
+        _ref: string;
+      };
+      alt?: string;
+    };
+    technologies: string[];
+  }
+}
+
+const { project } = Astro.props;
+
+// Initialize Sanity client for image URLs
+const client = createClient({
+  projectId: "9bdbnjzy",
+  dataset: "production",
+  useCdn: false,
+  apiVersion: "2023-01-01",
+});
+
+// Get image URL from Sanity
+const thumbnailUrl = `https://cdn.sanity.io/images/9bdbnjzy/production/${project.thumbnail.asset._ref.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`;
+
+// Status styling
+const statusStyles = {
+  completed: "bg-green-500/20 text-green-400 border-green-500/30",
+  inProgress: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+};
+
+const statusLabels = {
+  completed: "Complété",
+  inProgress: "En cours"
+};
 ---
 
-<div class="flex flex-col items-center  rounded-4xl  hover:scale-105  transition-transform duration-200 cursor-pointer ">
-            <Image src={formbuilder_thumbnail} height={300} alt="Form Builder" class=" object-cover rounded-4xl" />
+<div class="flex flex-col items-center rounded-4xl hover:scale-105 transition-transform duration-200 cursor-pointer">
+  <img src={thumbnailUrl} alt={project.thumbnail.alt || project.title} class="w-full h-[300px] object-contain " />
 
-    <div>
-        <h3 class="text-lg font-semibold text-center text-mochawhite">Form Builder</h3>
-        <p class="text-mochawhite/70 text-sm text-center">Une application web permettant de créer des formulaires facilement et de les exporter.</p>
+  <div class="w-full px-4 py-3">
+    <div class="flex gap-2 justify-center items-center mb-2">
+      <h3 class="text-lg text-center font-semibold text-mochawhite">{project.title}</h3>
+      
+        <span class={`px-2 py-1 rounded-md text-xs border ${statusStyles[project.status]}`}>
+          {statusLabels[project.status]}
+        </span>
+        <span class="text-xs text-mochawhite/50">{project.year}</span>
+      
     </div>
-    <div class="flex flex-row justify-center gap-2 mt-2">
-        <span class="px-2 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-xs">Vue.js</span>
-        <span class="px-2 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-xs">TypeScript</span>
-        <span class="px-2 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-xs">TailwindCSS</span>
 
+    <p class="text-mochawhite/70 text-sm text-center mb-3">{project.summary}</p>
+
+    <div class="flex flex-wrap justify-center gap-2">
+      {project.technologies.map((tech) => (
+        <span class="px-2 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-xs">
+          {tech}
+        </span>
+      ))}
     </div>
+  </div>
 </div>

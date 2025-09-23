@@ -1,13 +1,56 @@
 ---
 import ProjectCard from './ProjectCard.astro';
-const {id} = Astro.props;
+import { createClient } from "@sanity/client";
+
+const { id } = Astro.props;
+
+// Initialize Sanity client
+const client = createClient({
+  projectId: "9bdbnjzy",
+  dataset: "production",
+  useCdn: false,
+  apiVersion: "2023-01-01",
+});
+
+// Project interface
+interface Project {
+  _id: string;
+  title: string;
+  summary: string;
+  status: 'completed' | 'inProgress';
+  year: number;
+  thumbnail: {
+    asset: {
+      _ref: string;
+    };
+    alt?: string;
+  };
+  technologies: string[];
+  featured: boolean;
+  order?: number;
+}
+
+// Fetch projects from Sanity
+const projects: Project[] = await client.fetch(`
+  *[_type == "project"] | order(coalesce(order, 999) asc, _createdAt desc) {
+    _id,
+    title,
+    summary,
+    status,
+    year,
+    thumbnail,
+    technologies,
+    featured,
+    order
+  }
+`);
 ---
-<div id={id} class=" ">
+<div id={id} class="">
     <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2 text-center">Projets</h2>
     <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-4" >
-        <ProjectCard />
-        <ProjectCard />
-
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
+        {projects.map((project) => (
+            <ProjectCard project={project} />
+        ))}
     </div>
 </div>
