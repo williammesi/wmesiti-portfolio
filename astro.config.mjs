@@ -8,11 +8,15 @@ import react from "@astrojs/react";
 
 import sanity from "@sanity/astro";
 
+import vercel from "@astrojs/vercel";
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+
+  // Removed webcore() since the package doesn't exist
   integrations: [
     vue(),
     icon(),
@@ -25,5 +29,6 @@ export default defineConfig({
       studioBasePath: "/admin",
     }),
   ],
-  // Removed webcore() since the package doesn't exist
+
+  adapter: vercel()
 });
