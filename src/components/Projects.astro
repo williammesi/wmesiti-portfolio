@@ -1,0 +1,13 @@
+---
+import ProjectCard from './ProjectCard.astro';
+const {id} = Astro.props;
+---
+<div id={id} class=" ">
+    <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2 text-center">Projets</h2>
+    <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
+    <div class="grid grid-cols-2 gap-8 p-4" >
+        <ProjectCard />
+        <ProjectCard />
+
+    </div>
+</div>

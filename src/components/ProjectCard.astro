@@ -1,0 +1,19 @@
+---
+import Image from "astro/components/Image.astro";
+import formbuilder_thumbnail from "../assets/projects/formbuilder_thumbnail.png";
+---
+
+<div class="flex flex-col items-center  rounded-4xl  hover:scale-105  transition-transform duration-200 cursor-pointer ">
+            <Image src={formbuilder_thumbnail} height={300} alt="Form Builder" class=" object-cover rounded-4xl" />
+
+    <div>
+        <h3 class="text-lg font-semibold text-center text-mochawhite">Form Builder</h3>
+        <p class="text-mochawhite/70 text-sm text-center">Une application web permettant de créer des formulaires facilement et de les exporter.</p>
+    </div>
+    <div class="flex flex-row justify-center gap-2 mt-2">
+        <span class="px-2 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-xs">Vue.js</span>
+        <span class="px-2 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-xs">TypeScript</span>
+        <span class="px-2 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-xs">TailwindCSS</span>
+
+    </div>
+</div>
