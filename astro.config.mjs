@@ -133,6 +133,7 @@ export default defineConfig({
         hostname: "cdn.sanity.io",
       },
     ],
+    service: { entrypoint: 'astro/assets/services/sharp' },
   },
 
   // Security headers
