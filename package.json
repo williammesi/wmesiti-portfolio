@@ -30,6 +30,7 @@
     "react-is": "^19.1.1",
     "reka-ui": "^2.5.0",
     "sanity": "^4.9.0",
+    "sharp": "^0.34.4",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
