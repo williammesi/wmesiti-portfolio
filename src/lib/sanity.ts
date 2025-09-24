@@ -9,7 +9,7 @@ const apiVersion = import.meta.env.PUBLIC_SANITY_API_VERSION || "2023-01-01";
 export const sanityClient = createClient({
   projectId,
   dataset,
-  useCdn: import.meta.env.PROD, // Use CDN in production for better performance
+  useCdn: false, // Disable CDN for immediate content updates
   apiVersion,
   perspective: 'published', // Only fetch published content
 });

@@ -106,7 +106,7 @@ export default defineConfig({
       useCdn: true,
       studioBasePath: "/admin",
       // Optimize GROQ queries
-      apiVersion: "2023-01-01",
+      apiVersion: "2025-09-23",
     }),
   ],
 
@@ -119,8 +119,8 @@ export default defineConfig({
     },
     imageService: true,
     isr: {
-      // Incremental Static Regeneration for better performance
-      expiration: 60 * 60 * 24, // 24 hours
+      // Incremental Static Regeneration with shorter cache for content updates
+      expiration: 60, // 1 minute - content updates appear quickly
     },
   }),
 
@@ -133,7 +133,7 @@ export default defineConfig({
         hostname: "cdn.sanity.io",
       },
     ],
-    service: { entrypoint: 'astro/assets/services/sharp' },
+    service: { entrypoint: "astro/assets/services/sharp" },
   },
 
   // Security headers
