@@ -15,8 +15,8 @@ export default defineConfig({
 
   // Build optimizations
   build: {
-    // Inline stylesheets smaller than 4kb
-    inlineStylesheets: "auto",
+    // Inline stylesheets for better CSS loading
+    inlineStylesheets: "always",
   },
 
   // Vite configuration for performance
@@ -24,7 +24,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
     build: {
       // CSS code splitting for better performance
-      cssCodeSplit: true,
+      cssCodeSplit: false, // Disable CSS splitting for Vercel compatibility
       // Rollup optimizations
       rollupOptions: {
         output: {
