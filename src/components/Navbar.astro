@@ -2,6 +2,8 @@
 import { Button } from '@/components/ui/button'
 import { Image } from "astro:assets";
 import profilePic from "../assets/profile.webp";
+// Import the PDF file
+import cvPDF from "../assets/CV_WILLIAM_MESITI_2025.pdf";
 import Profile from './Profile.astro';
 ---
 
@@ -22,12 +24,10 @@ import Profile from './Profile.astro';
         <a href="/#experience">
             <Button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Expérience</Button>
         </a>
-        <a href="/CV_WILLIAM_MESITI_2025.pdf" download="CV_William_Mesiti_2025.pdf">
+        <a href={cvPDF} download="CV_William_Mesiti_2025.pdf" target="_blank" rel="noopener noreferrer">
             <Button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Mon CV</Button>
         </a>
     </div>
-
- 
 
     <!-- Mobile Hamburger Menu -->
     <button id="mobile-menu-button" class="lg:hidden flex flex-col gap-1 p-2 z-50 relative">
@@ -51,11 +51,9 @@ import Profile from './Profile.astro';
             <a href="/#projects" class="mobile-nav-link">
                 <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Projets</Button>
             </a>
-            <a href="/CV_WILLIAM_MESITI_2025.pdf" download="CV_William_Mesiti_2025.pdf" class="mobile-nav-link">
+            <a href={cvPDF} class="mobile-cv-link" target="_blank" rel="noopener noreferrer" data-cv-url={cvPDF}>
                 <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Mon CV</Button>
             </a>
-
-
         </div>
     </div>
 </div>
@@ -78,6 +76,7 @@ import Profile from './Profile.astro';
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
     const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    const mobileCvLink = document.querySelector('.mobile-cv-link') as HTMLAnchorElement;
 
     function toggleMobileMenu() {
         const isOpen = mobileMenu?.classList.contains('opacity-100');
@@ -106,20 +105,57 @@ import Profile from './Profile.astro';
 
     // Close menu when clicking navigation links
     mobileNavLinks.forEach(link => {
-        link.addEventListener('click', closeMobileMenu);
+        link.addEventListener('click', () => {
+            closeMobileMenu();
+        });
     });
 
+    // Handle CV link for mobile with enhanced support
+    if (mobileCvLink) {
+        mobileCvLink.addEventListener('click', (e: MouseEvent) => {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+            const isAndroid = /Android/.test(navigator.userAgent);
+            
+            // Close menu after a small delay
+            setTimeout(closeMobileMenu, 100);
+            
+            // For iOS, the target="_blank" will handle it
+            // For Android, we might need to force download
+            if (isAndroid) {
+                e.preventDefault();
+                const cvUrl = mobileCvLink.getAttribute('data-cv-url');
+                if (cvUrl) {
+                    // Try to force download for Android
+                    const link = document.createElement('a');
+                    link.href = cvUrl;
+                    link.download = 'CV_William_Mesiti_2025.pdf';
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Fallback to opening in new tab if download doesn't work
+                    setTimeout(() => {
+                        window.open(cvUrl, '_blank');
+                    }, 500);
+                }
+            }
+            // For iOS and desktop, let the default behavior handle it
+        });
+    }
+
     // Close menu on escape key
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
             closeMobileMenu();
         }
     });
 
     // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        const isClickInsideMenu = mobileMenu?.contains(e.target as Node);
-        const isClickOnButton = mobileMenuButton?.contains(e.target as Node);
+    document.addEventListener('click', (e: MouseEvent) => {
+        const target = e.target as Node;
+        const isClickInsideMenu = mobileMenu?.contains(target);
+        const isClickOnButton = mobileMenuButton?.contains(target);
 
         if (!isClickInsideMenu && !isClickOnButton) {
             closeMobileMenu();
