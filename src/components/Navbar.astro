@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Image } from "astro:assets";
 import profilePic from "../assets/profile.webp";
 // Import the PDF file
-import cvPDF from "../../public/pdf/CV_WILLIAM_MESITI_2025.pdf";
+import cvPDF from "/pdf/CV_WILLIAM_MESITI_2025.pdf";
 import Profile from './Profile.astro';
 ---
 
@@ -51,7 +51,7 @@ import Profile from './Profile.astro';
             <a href="/#projects" class="mobile-nav-link">
                 <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Projets</Button>
             </a>
-            <a href={cvPDF} download="CV_William_Mesiti_2025.pdf" target="_blank" rel="noopener noreferrer">
+            <a href={cvPDF} target="_blank" rel="noopener noreferrer">
                 <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Mon CV</Button>
             </a>
         </div>
