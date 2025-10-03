@@ -1,43 +1,298 @@
 ---
 import { Icon } from 'astro-icon/components'
-
 ---
 
-<script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
-<el-dropdown class="inline-block">
-  <!-- <button class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20">
-    Options
-    
-  </button> -->
+<style>
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
 
-  <button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder rounded-lg text-mochawhite px-4 py-2  flex flex-row gap-4 items-center cursor-pointer" >
-        <img class="rounded-full overflow-clip w-[50px] h-[50px] object-cover" src="/profile.webp" alt="Profile Picture" loading="lazy" />
-        <span class="font-medium text-md" >William Mesiti</span>
-        <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="-mr-1 size-5 text-mochawhite">
-            <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
-        </svg>
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 14rem;
+    background: var(--mocha-surface, #1e1e2e);
+    border: 1px solid var(--mocha-border, #313244);
+    border-radius: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transform-origin: top right;
+    transition: opacity 150ms ease, transform 150ms ease, visibility 150ms;
+    z-index: 50;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+
+  .dropdown.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+  }
+
+  .dropdown-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--mocha-surface, #1e1e2e);
+    border: 1px solid var(--mocha-border, #313244);
+    border-radius: 0.5rem;
+    color: var(--mocha-white, #cdd6f4);
+    cursor: pointer;
+    transition: background-color 200ms ease;
+    font-family: inherit;
+  }
+
+  .dropdown-button:hover {
+    background: rgba(69, 71, 90, 0.5);
+  }
+
+  .dropdown-button img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .dropdown-button span {
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  .dropdown-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: -0.25rem;
+    transition: transform 200ms ease;
+  }
+
+  .dropdown.open .dropdown-button svg {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-menu-items {
+    padding: 0.25rem 0;
+  }
+
+  .dropdown-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    color: var(--mocha-white, #cdd6f4);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background-color 150ms ease;
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(69, 71, 90, 0.5);
+  }
+
+  .dropdown-item:focus-visible {
+    outline: 2px solid var(--mocha-white, #cdd6f4);
+    outline-offset: -2px;
+  }
+
+  /* Overlay to capture clicks outside */
+  .dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 40;
+    display: none;
+  }
+
+  .dropdown.open .dropdown-overlay {
+    display: block;
+  }
+</style>
+
+<div class="dropdown" data-dropdown>
+  <button 
+    class="dropdown-button bg-mochasurface hover:bg-mochasurfacelight/50 border-mochaborder text-mochawhite"
+    aria-expanded="false"
+    aria-haspopup="true"
+    data-dropdown-toggle>
+    <img src="/profile.webp" alt="Profile Picture" loading="lazy" />
+    <span>William Mesiti</span>
+    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+    </svg>
   </button>
-  <el-menu anchor="bottom end" popover class="w-56 origin-top-right rounded-md bg-mochasurface outline-1 -outline-offset-1 outline-mochaborder transition transition-discrete [--anchor-gap:--spacing(2)] data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in">
-    <div class="py-1">
-        <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-mesiti-44960b28b/" class="flex flex-row items-center gap-4 px-4 py-2 text-sm text-mochawhite focus:bg-mochasurfacelight/50 focus:outline-hidden">
-            <Icon name="mdi:linkedin" width="25px" height="25px"  style="color: #cdd6f4" />
-            LinkedIn
-        </a>
-        <a target="_blank" rel="noopener noreferrer" href="https://github.com/williammesi" class="flex flex-row items-center gap-4 px-4 py-2 text-sm text-mochawhite focus:bg-mochasurfacelight/50 focus:outline-hidden">
-            <Icon name="mdi:github" width="25px" height="25px"  style="color: #cdd6f4" />
-            Github
-        </a>
-        <a target="_blank" rel="noopener noreferrer" href="mailto:wmesiti.tech@gmail.com" class="flex flex-row items-center gap-4 px-4 py-2 text-sm text-mochawhite focus:bg-mochasurfacelight/50 focus:outline-hidden">
-            <Icon name="mdi:email" width="25px" height="25px"  style="color: #cdd6f4" />
-            Email
-        </a>
-        <a target="_blank" rel="noopener noreferrer" href="tel:+15797301506" class="flex flex-row items-center gap-4 px-4 py-2 text-sm text-mochawhite focus:bg-mochasurfacelight/50 focus:outline-hidden">
-            <Icon name="mdi:phone" width="25px" height="25px"  style="color: #cdd6f4" />
-            Telephone
-        </a>
-        
-      
-      
+  
+  <div class="dropdown-overlay" data-dropdown-overlay></div>
+  
+  <div class="dropdown-menu" role="menu" data-dropdown-menu>
+    <div class="dropdown-menu-items">
+      <a 
+        href="https://www.linkedin.com/in/william-mesiti-44960b28b/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="dropdown-item"
+        role="menuitem">
+        <Icon name="mdi:linkedin" width="25px" height="25px" style="color: #cdd6f4" />
+        LinkedIn
+      </a>
+      <a 
+        href="https://github.com/williammesi"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="dropdown-item"
+        role="menuitem">
+        <Icon name="mdi:github" width="25px" height="25px" style="color: #cdd6f4" />
+        Github
+      </a>
+      <a 
+        href="mailto:wmesiti.tech@gmail.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="dropdown-item"
+        role="menuitem">
+        <Icon name="mdi:email" width="25px" height="25px" style="color: #cdd6f4" />
+        Email
+      </a>
+      <a 
+        href="tel:+15797301506"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="dropdown-item"
+        role="menuitem">
+        <Icon name="mdi:phone" width="25px" height="25px" style="color: #cdd6f4" />
+        Telephone
+      </a>
     </div>
-  </el-menu>
-</el-dropdown>
+  </div>
+</div>
+
+<script>
+  interface DropdownElements {
+    container: HTMLElement;
+    toggle: HTMLButtonElement;
+    menu: HTMLElement;
+    overlay: HTMLElement;
+  }
+
+  class Dropdown {
+    private elements: DropdownElements;
+    private isOpen: boolean = false;
+
+    constructor(container: HTMLElement) {
+      const toggle = container.querySelector('[data-dropdown-toggle]') as HTMLButtonElement;
+      const menu = container.querySelector('[data-dropdown-menu]') as HTMLElement;
+      const overlay = container.querySelector('[data-dropdown-overlay]') as HTMLElement;
+
+      if (!toggle || !menu || !overlay) {
+        throw new Error('Dropdown elements not found');
+      }
+
+      this.elements = {
+        container,
+        toggle,
+        menu,
+        overlay
+      };
+
+      this.init();
+    }
+
+    private init(): void {
+      // Toggle button click
+      this.elements.toggle.addEventListener('click', (e: MouseEvent) => {
+        e.stopPropagation();
+        this.toggle();
+      });
+
+      // Close on overlay click
+      this.elements.overlay.addEventListener('click', () => {
+        this.close();
+      });
+
+      // Close on escape key
+      document.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.close();
+          this.elements.toggle.focus();
+        }
+      });
+
+      // Prevent menu clicks from closing
+      this.elements.menu.addEventListener('click', (e: MouseEvent) => {
+        e.stopPropagation();
+      });
+
+      // Handle focus trap
+      this.elements.menu.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Tab') {
+          this.handleTabKey(e);
+        }
+      });
+    }
+
+    private toggle(): void {
+      if (this.isOpen) {
+        this.close();
+      } else {
+        this.open();
+      }
+    }
+
+    private open(): void {
+      this.isOpen = true;
+      this.elements.container.classList.add('open');
+      this.elements.toggle.setAttribute('aria-expanded', 'true');
+      
+      // Focus first menu item
+      requestAnimationFrame(() => {
+        const firstItem = this.elements.menu.querySelector('a') as HTMLElement;
+        if (firstItem) {
+          firstItem.focus();
+        }
+      });
+    }
+
+    private close(): void {
+      this.isOpen = false;
+      this.elements.container.classList.remove('open');
+      this.elements.toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    private handleTabKey(e: KeyboardEvent): void {
+      const focusableElements = this.elements.menu.querySelectorAll<HTMLElement>(
+        'a[href], button, [tabindex]:not([tabindex="-1"])'
+      );
+      
+      if (focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      // Tab backwards from first element
+      if (e.shiftKey && activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      }
+      // Tab forward from last element
+      else if (!e.shiftKey && activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    }
+  }
+
+  // Initialize all dropdowns
+  document.addEventListener('DOMContentLoaded', () => {
+    const dropdowns = document.querySelectorAll<HTMLElement>('[data-dropdown]');
+    dropdowns.forEach(dropdown => {
+      new Dropdown(dropdown);
+    });
+  });
+</script>
