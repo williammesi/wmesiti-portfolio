@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Image } from "astro:assets";
 import profilePic from "../assets/profile.webp";
 // Import the PDF file
-import cvPDF from "../assets/CV_WILLIAM_MESITI_2025.pdf";
+import cvPDF from "../../public/pdf/CV_WILLIAM_MESITI_2025.pdf";
 import Profile from './Profile.astro';
 ---
 
@@ -51,7 +51,7 @@ import Profile from './Profile.astro';
             <a href="/#projects" class="mobile-nav-link">
                 <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Projets</Button>
             </a>
-            <a href={cvPDF} class="mobile-cv-link" target="_blank" rel="noopener noreferrer" data-cv-url={cvPDF}>
+            <a href={cvPDF} download="CV_William_Mesiti_2025.pdf" target="_blank" rel="noopener noreferrer">
                 <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Mon CV</Button>
             </a>
         </div>
@@ -110,39 +110,7 @@ import Profile from './Profile.astro';
         });
     });
 
-    // Handle CV link for mobile with enhanced support
-    if (mobileCvLink) {
-        mobileCvLink.addEventListener('click', (e: MouseEvent) => {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-            const isAndroid = /Android/.test(navigator.userAgent);
-            
-            // Close menu after a small delay
-            setTimeout(closeMobileMenu, 100);
-            
-            // For iOS, the target="_blank" will handle it
-            // For Android, we might need to force download
-            if (isAndroid) {
-                e.preventDefault();
-                const cvUrl = mobileCvLink.getAttribute('data-cv-url');
-                if (cvUrl) {
-                    // Try to force download for Android
-                    const link = document.createElement('a');
-                    link.href = cvUrl;
-                    link.download = 'CV_William_Mesiti_2025.pdf';
-                    link.style.display = 'none';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    // Fallback to opening in new tab if download doesn't work
-                    setTimeout(() => {
-                        window.open(cvUrl, '_blank');
-                    }, 500);
-                }
-            }
-            // For iOS and desktop, let the default behavior handle it
-        });
-    }
+    
 
     // Close menu on escape key
     document.addEventListener('keydown', (e: KeyboardEvent) => {
