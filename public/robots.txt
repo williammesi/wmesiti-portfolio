@@ -6,5 +6,4 @@ Allow: /
 Disallow: /admin
 
 # Sitemap location
-Sitemap: https://wmesiti-portfolio.vercel.app/sitemap-index.xml
-Sitemap: https://wmesiti-portfolio.vercel.app/sitemap-0.xml
+Sitemap: https://wmesiti-portfolio.vercel.app/sitemap.xml

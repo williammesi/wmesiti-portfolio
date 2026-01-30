@@ -6,7 +6,7 @@ import icon from "astro-icon";
 import react from "@astrojs/react";
 import sanity from "@sanity/astro";
 import vercel from "@astrojs/vercel";
-import sitemap from "@astrojs/sitemap";
+// Removed @astrojs/sitemap - using custom sitemap.xml.ts instead for better SSR support
 
 // https://astro.build/config
 export default defineConfig({
@@ -109,13 +109,7 @@ export default defineConfig({
       // Optimize GROQ queries
       apiVersion: "2025-09-23",
     }),
-    sitemap({
-      // Sitemap configuration for better SEO
-      filter: (page) => !page.includes('/admin'), // Exclude admin pages
-      changefreq: 'weekly',
-      priority: 0.7,
-      lastmod: new Date(),
-    }),
+    // Using custom sitemap.xml.ts endpoint instead for better SSR support
   ],
 
   // Server-side rendering configuration
