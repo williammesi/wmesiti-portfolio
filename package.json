@@ -10,12 +10,13 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.3.1",
-    "@astrojs/vercel": "^8.2.8",
+    "@astrojs/sitemap": "^3.7.0",
+    "@astrojs/vercel": "^9.0.4",
     "@astrojs/vue": "^5.1.1",
     "@material-tailwind/react": "^2.1.10",
     "@sanity/astro": "^3.2.10",
     "@sanity/client": "^7.11.2",
-    "@sanity/vision": "^4.9.0",
+    "@sanity/vision": "^5.7.0",
     "@tailwindcss/vite": "^4.1.13",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
@@ -29,7 +30,7 @@
     "react-dom": "^19.1.1",
     "react-is": "^19.1.1",
     "reka-ui": "^2.5.0",
-    "sanity": "^4.9.0",
+    "sanity": "^5.7.0",
     "sharp": "^0.34.4",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1",
@@ -44,5 +45,11 @@
     "@iconify-json/mdi": "^1.2.3",
     "@iconify/vue": "^5.0.0",
     "astro-icon": "^1.1.5"
+  },
+  "overrides": {
+    "path-to-regexp": "^6.3.0",
+    "glob": "^11.0.0",
+    "prismjs": "^1.30.0",
+    "undici": "^6.23.0"
   }
 }
