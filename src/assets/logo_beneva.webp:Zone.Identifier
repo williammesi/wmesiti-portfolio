@@ -1,4 +1,0 @@
-[ZoneTransfer]
-ZoneId=3
-ReferrerUrl=https://cloudconvert.com/
-HostUrl=https://eu-central.storage.cloudconvert.com/tasks/9634e89e-7d54-4bad-8c43-ccd2d6c78abb/logo_beneva.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20250921%2Ffra%2Fs3%2Faws4_request&X-Amz-Date=20250921T224259Z&X-Amz-Expires=86400&X-Amz-Signature=971dec5733a9a4ed6a3dbc8adf7e10e69f8445d7718db1bf6c3f596df20a761e&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22logo_beneva.webp%22&response-content-type=image%2Fwebp&x-id=GetObject
