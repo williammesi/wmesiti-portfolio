@@ -1,0 +1,221 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { sanityFetch, queries } from "@/lib/sanity";
+import { safeAsync } from "@/utils/errorHandling";
+import { hasValidSession } from "@/lib/auth";
+import { PortableText } from "astro-portabletext";
+import type { BlogPost } from "@/types/sanity";
+
+// Get params
+const { category, slug } = Astro.params;
+
+// Fetch blog post
+const post = await safeAsync(
+    () =>
+        sanityFetch<BlogPost | null>(queries.blogPostBySlug, {
+            slug,
+            categorySlug: category,
+        }),
+    null,
+);
+
+// If post doesn't exist, return 404
+if (!post) {
+    return Astro.redirect("/404");
+}
+
+// Check if category is protected and validate session
+if (post.category.isProtected) {
+    const isAuthenticated = await hasValidSession(
+        Astro.request,
+        category as string,
+    );
+
+    if (!isAuthenticated) {
+        return Astro.redirect(`/blog/${category}/login`);
+    }
+}
+
+// Format date helper
+function formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+}
+
+// Get image URL from Sanity
+function getImageUrl(image: any): string | null {
+    if (!image?.asset?._ref) return null;
+    return `https://cdn.sanity.io/images/9bdbnjzy/production/${image.asset._ref.replace("image-", "").replace("-jpg", ".jpg").replace("-png", ".png").replace("-webp", ".webp")}`;
+}
+
+const coverImageUrl = getImageUrl(post.coverImage);
+
+// SEO data
+const seoData = {
+    title: `${post.title} - ${post.category.title} - Blog`,
+    description: post.excerpt,
+    image: coverImageUrl || undefined,
+    type: "article" as const,
+};
+
+// Custom Portable Text components
+const components = {
+    block: {
+        h2: "h2",
+        h3: "h3",
+        h4: "h4",
+        normal: "p",
+        blockquote: "blockquote",
+    },
+    marks: {
+        strong: "strong",
+        em: "em",
+        code: "code",
+        link: ({ value, children }: any) => {
+            return `<a href="${value?.href}" class="text-blue-400 hover:text-blue-300 underline" target="_blank" rel="noopener noreferrer">${children}</a>`;
+        },
+    },
+};
+---
+
+<Layout {...seoData}>
+    <div class="w-full lg:w-9/10 mx-auto p-4">
+        <!-- Back Navigation -->
+        <div class="mb-6">
+            <a
+                href={`/blog/${category}`}
+                class="inline-flex items-center gap-2 px-4 py-2 bg-mochasurface hover:bg-mochasurfacelight border border-mochaborder rounded-lg text-mochawhite transition-colors"
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M19 12H5M12 19L5 12L12 5"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+                Retour à {post.category.title}
+            </a>
+        </div>
+
+        <article class="max-w-3xl mx-auto">
+            <!-- Header -->
+            <header class="mb-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span
+                        class="px-3 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite/70 text-sm"
+                    >
+                        {post.category.title}
+                    </span>
+                    {
+                        post.featured && (
+                            <span class="px-2 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-md text-xs">
+                                En vedette
+                            </span>
+                        )
+                    }
+                </div>
+
+                <h1
+                    class="text-3xl md:text-4xl lg:text-5xl font-bold text-mochawhite mb-4 leading-tight"
+                >
+                    {post.title}
+                </h1>
+
+                <p class="text-mochawhite/70 text-lg mb-4">
+                    {post.excerpt}
+                </p>
+
+                <time class="text-mochawhite/50 text-sm">
+                    Publié le {formatDate(post.publishedAt)}
+                </time>
+            </header>
+
+            <!-- Cover Image -->
+            {
+                coverImageUrl && (
+                    <div class="mb-8 rounded-2xl overflow-hidden">
+                        <img
+                            src={coverImageUrl}
+                            alt={post.title}
+                            class="w-full h-auto"
+                        />
+                    </div>
+                )
+            }
+
+            <!-- Content -->
+            <div class="prose prose-invert prose-lg max-w-none">
+                <PortableText value={post.content} />
+            </div>
+        </article>
+    </div>
+</Layout>
+
+<style>
+    /* Portable Text styling */
+    .prose :global(h2) {
+        @apply text-2xl font-bold text-mochawhite mt-8 mb-4;
+    }
+
+    .prose :global(h3) {
+        @apply text-xl font-bold text-mochawhite mt-6 mb-3;
+    }
+
+    .prose :global(h4) {
+        @apply text-lg font-semibold text-mochawhite mt-4 mb-2;
+    }
+
+    .prose :global(p) {
+        @apply text-mochawhite/80 leading-relaxed mb-4;
+    }
+
+    .prose :global(blockquote) {
+        @apply border-l-4 border-mochaborder pl-4 italic text-mochawhite/60 my-6;
+    }
+
+    .prose :global(code) {
+        @apply bg-mochasurface px-2 py-1 rounded text-sm font-mono text-mochawhite;
+    }
+
+    .prose :global(pre) {
+        @apply bg-mochasurface border border-mochaborder rounded-lg p-4 overflow-x-auto my-6;
+    }
+
+    .prose :global(pre code) {
+        @apply bg-transparent p-0;
+    }
+
+    .prose :global(ul) {
+        @apply list-disc list-inside text-mochawhite/80 mb-4 space-y-2;
+    }
+
+    .prose :global(ol) {
+        @apply list-decimal list-inside text-mochawhite/80 mb-4 space-y-2;
+    }
+
+    .prose :global(a) {
+        @apply text-blue-400 hover:text-blue-300 underline;
+    }
+
+    .prose :global(img) {
+        @apply rounded-lg my-6;
+    }
+
+    .prose :global(figure) {
+        @apply my-6;
+    }
+
+    .prose :global(figcaption) {
+        @apply text-center text-mochawhite/50 text-sm mt-2;
+    }
+</style>

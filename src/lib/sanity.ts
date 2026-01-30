@@ -95,4 +95,99 @@ export const queries = {
       "slug": slug.current
     }
   `,
+
+  // ===== Blog Queries =====
+
+  // Get all blog categories (public info only, no password hash)
+  blogCategories: `
+    *[_type == "blogCategory"] | order(coalesce(order, 999) asc, _createdAt desc) {
+      _id,
+      title,
+      slug,
+      description,
+      isProtected,
+      order,
+      "postCount": count(*[_type == "blogPost" && references(^._id)])
+    }
+  `,
+
+  // Get single category by slug (includes password hash for auth)
+  blogCategoryBySlug: `
+    *[_type == "blogCategory" && slug.current == $slug][0] {
+      _id,
+      title,
+      slug,
+      description,
+      isProtected,
+      passwordHash,
+      order
+    }
+  `,
+
+  // Get single category by slug (public, no password hash)
+  blogCategoryBySlugPublic: `
+    *[_type == "blogCategory" && slug.current == $slug][0] {
+      _id,
+      title,
+      slug,
+      description,
+      isProtected,
+      order
+    }
+  `,
+
+  // Get all blog posts for a category
+  blogPostsByCategory: `
+    *[_type == "blogPost" && category->slug.current == $categorySlug] | order(coalesce(order, 999) asc, publishedAt desc) {
+      _id,
+      title,
+      slug,
+      excerpt,
+      coverImage,
+      publishedAt,
+      featured,
+      order,
+      category->{
+        title,
+        slug,
+        isProtected
+      }
+    }
+  `,
+
+  // Get single blog post by slug
+  blogPostBySlug: `
+    *[_type == "blogPost" && slug.current == $slug && category->slug.current == $categorySlug][0] {
+      _id,
+      title,
+      slug,
+      excerpt,
+      content,
+      coverImage,
+      publishedAt,
+      featured,
+      order,
+      category->{
+        _id,
+        title,
+        slug,
+        isProtected
+      }
+    }
+  `,
+
+  // Get all blog post paths for static generation
+  blogPostPaths: `
+    *[_type == "blogPost"] {
+      "slug": slug.current,
+      "categorySlug": category->slug.current
+    }
+  `,
+
+  // Get all category slugs for static paths
+  blogCategorySlugs: `
+    *[_type == "blogCategory"] {
+      "slug": slug.current
+    }
+  `,
 } as const;

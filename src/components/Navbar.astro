@@ -1,58 +1,122 @@
 ---
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import { Image } from "astro:assets";
 import profilePic from "../assets/profile.webp";
 // Import the PDF file
 import cvPDF from "/pdf/CV_WILLIAM_MESITI_2025.pdf";
-import Profile from './Profile.astro';
+import Profile from "./Profile.astro";
 ---
 
-<div class="sticky top-0 w-full z-50 py-4 px-4 sm:px-8 border-b border-b-mochaborder bg-mochablack flex flex-row justify-between items-center">
+<div
+    class="sticky top-0 w-full z-50 py-4 px-4 sm:px-8 border-b border-b-mochaborder bg-mochablack flex flex-row justify-between items-center"
+>
     <Profile />
 
     <!-- Desktop Navigation -->
     <div class="hidden lg:flex gap-4 flex-row">
         <a href="/#about">
-            <Button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">À propos</Button>
+            <Button
+                class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                >À propos</Button
+            >
         </a>
         <a href="/#skills">
-            <Button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Compétences</Button>
+            <Button
+                class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                >Compétences</Button
+            >
         </a>
         <a href="/#projects">
-            <Button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Projets</Button>
+            <Button
+                class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                >Projets</Button
+            >
         </a>
         <a href="/#experience">
-            <Button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Expérience</Button>
+            <Button
+                class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                >Expérience</Button
+            >
         </a>
-        <a href={cvPDF} download="CV_William_Mesiti_2025.pdf" target="_blank" rel="noopener noreferrer">
-            <Button class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Mon CV</Button>
+        <a href="/blog">
+            <Button
+                class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                >Blog</Button
+            >
+        </a>
+        <a
+            href={cvPDF}
+            download="CV_William_Mesiti_2025.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            <Button
+                class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                >Mon CV</Button
+            >
         </a>
     </div>
 
     <!-- Mobile Hamburger Menu -->
-    <button id="mobile-menu-button" class="lg:hidden flex flex-col gap-1 p-2 z-50 relative">
-        <div class="hamburger-line w-6 h-0.5 bg-mochawhite transition-all duration-300"></div>
-        <div class="hamburger-line w-6 h-0.5 bg-mochawhite transition-all duration-300"></div>
-        <div class="hamburger-line w-6 h-0.5 bg-mochawhite transition-all duration-300"></div>
+    <button
+        id="mobile-menu-button"
+        class="lg:hidden flex flex-col gap-1 p-2 z-50 relative"
+    >
+        <div
+            class="hamburger-line w-6 h-0.5 bg-mochawhite transition-all duration-300"
+        >
+        </div>
+        <div
+            class="hamburger-line w-6 h-0.5 bg-mochawhite transition-all duration-300"
+        >
+        </div>
+        <div
+            class="hamburger-line w-6 h-0.5 bg-mochawhite transition-all duration-300"
+        >
+        </div>
     </button>
 
     <!-- Mobile Dropdown Menu -->
-    <div id="mobile-menu" class="absolute top-full left-0 right-0 bg-mochablack border-b border-mochaborder opacity-0 invisible transform translate-y-2 transition-all duration-300 z-40 lg:hidden">
+    <div
+        id="mobile-menu"
+        class="absolute top-full left-0 right-0 bg-mochablack border-b border-mochaborder opacity-0 invisible transform translate-y-2 transition-all duration-300 z-40 lg:hidden"
+    >
         <div class="flex flex-col p-4 gap-3">
             <a href="/#about" class="mobile-nav-link">
-                <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">À propos</Button>
+                <Button
+                    class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                    >À propos</Button
+                >
             </a>
             <a href="/#skills" class="mobile-nav-link">
-                <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Compétences</Button>
+                <Button
+                    class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                    >Compétences</Button
+                >
             </a>
             <a href="/#experience" class="mobile-nav-link">
-                <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Expérience</Button>
+                <Button
+                    class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                    >Expérience</Button
+                >
             </a>
             <a href="/#projects" class="mobile-nav-link">
-                <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Projets</Button>
+                <Button
+                    class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                    >Projets</Button
+                >
+            </a>
+            <a href="/blog" class="mobile-nav-link">
+                <Button
+                    class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                    >Blog</Button
+                >
             </a>
             <a href={cvPDF} target="_blank" rel="noopener noreferrer">
-                <Button class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">Mon CV</Button>
+                <Button
+                    class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
+                    >Mon CV</Button
+                >
             </a>
         </div>
     </div>
@@ -73,54 +137,70 @@ import Profile from './Profile.astro';
 </style>
 
 <script>
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-    const mobileCvLink = document.querySelector('.mobile-cv-link') as HTMLAnchorElement;
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+    const mobileCvLink = document.querySelector(
+        ".mobile-cv-link",
+    ) as HTMLAnchorElement;
 
     function toggleMobileMenu() {
-        const isOpen = mobileMenu?.classList.contains('opacity-100');
+        const isOpen = mobileMenu?.classList.contains("opacity-100");
 
         if (isOpen) {
             // Close menu
-            mobileMenu?.classList.remove('opacity-100', 'visible', 'translate-y-0');
-            mobileMenu?.classList.add('opacity-0', 'invisible', 'translate-y-2');
-            mobileMenuButton?.classList.remove('mobile-menu-open');
+            mobileMenu?.classList.remove(
+                "opacity-100",
+                "visible",
+                "translate-y-0",
+            );
+            mobileMenu?.classList.add(
+                "opacity-0",
+                "invisible",
+                "translate-y-2",
+            );
+            mobileMenuButton?.classList.remove("mobile-menu-open");
         } else {
             // Open menu
-            mobileMenu?.classList.remove('opacity-0', 'invisible', 'translate-y-2');
-            mobileMenu?.classList.add('opacity-100', 'visible', 'translate-y-0');
-            mobileMenuButton?.classList.add('mobile-menu-open');
+            mobileMenu?.classList.remove(
+                "opacity-0",
+                "invisible",
+                "translate-y-2",
+            );
+            mobileMenu?.classList.add(
+                "opacity-100",
+                "visible",
+                "translate-y-0",
+            );
+            mobileMenuButton?.classList.add("mobile-menu-open");
         }
     }
 
     function closeMobileMenu() {
-        mobileMenu?.classList.remove('opacity-100', 'visible', 'translate-y-0');
-        mobileMenu?.classList.add('opacity-0', 'invisible', 'translate-y-2');
-        mobileMenuButton?.classList.remove('mobile-menu-open');
+        mobileMenu?.classList.remove("opacity-100", "visible", "translate-y-0");
+        mobileMenu?.classList.add("opacity-0", "invisible", "translate-y-2");
+        mobileMenuButton?.classList.remove("mobile-menu-open");
     }
 
     // Toggle menu on hamburger button click
-    mobileMenuButton?.addEventListener('click', toggleMobileMenu);
+    mobileMenuButton?.addEventListener("click", toggleMobileMenu);
 
     // Close menu when clicking navigation links
-    mobileNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
+    mobileNavLinks.forEach((link) => {
+        link.addEventListener("click", () => {
             closeMobileMenu();
         });
     });
 
-    
-
     // Close menu on escape key
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
             closeMobileMenu();
         }
     });
 
     // Close menu when clicking outside
-    document.addEventListener('click', (e: MouseEvent) => {
+    document.addEventListener("click", (e: MouseEvent) => {
         const target = e.target as Node;
         const isClickInsideMenu = mobileMenu?.contains(target);
         const isClickOnButton = mobileMenuButton?.contains(target);
@@ -131,7 +211,7 @@ import Profile from './Profile.astro';
     });
 
     // Handle window resize
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
         if (window.innerWidth >= 1024) {
             closeMobileMenu();
         }

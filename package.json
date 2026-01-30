@@ -16,6 +16,7 @@
     "@material-tailwind/react": "^2.1.10",
     "@sanity/astro": "^3.2.10",
     "@sanity/client": "^7.11.2",
+    "@sanity/code-input": "^7.0.7",
     "@sanity/vision": "^5.7.0",
     "@tailwindcss/vite": "^4.1.13",
     "@types/react": "^19.1.13",
