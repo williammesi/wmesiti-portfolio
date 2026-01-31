@@ -9,6 +9,9 @@ import type {
     WeeklyLogPreview,
 } from "@/types/sanity";
 
+// Disable prerendering/ISR for protected categories (auth check required)
+export const prerender = false;
+
 // Get category slug from params
 const { category } = Astro.params;
 
