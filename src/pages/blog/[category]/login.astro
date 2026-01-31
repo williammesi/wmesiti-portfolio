@@ -72,19 +72,23 @@ if (Astro.request.method === "POST") {
                 console.log("[Auth] Setting cookie for category:", category);
                 console.log("[Auth] Cookie name:", cookieName);
 
-                // Use Astro's cookies API to set the cookie
+                // Build cookie header manually
                 // TODO : Change maxAge to something more reasonable
                 const maxAge = 1 * 60; // 1 minute in seconds
-                Astro.cookies.set(cookieName, token, {
-                    path: "/",
-                    httpOnly: true,
-                    sameSite: "lax",
-                    secure: import.meta.env.PROD,
-                    maxAge: maxAge,
-                });
+                const secure = import.meta.env.PROD ? "; Secure" : "";
+                const cookieHeader = `${cookieName}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
 
-                // Redirect after setting cookie
-                return Astro.redirect(`/blog/${category}`, 302);
+                console.log("[Auth] Cookie header:", cookieHeader);
+
+                // Return response with both cookie and redirect
+                // Must use Response constructor to include Set-Cookie header with redirect
+                return new Response(null, {
+                    status: 302,
+                    headers: {
+                        Location: `/blog/${category}`,
+                        "Set-Cookie": cookieHeader,
+                    },
+                });
             } else {
                 console.log("[Auth] Invalid password for category:", category);
                 error = "Mot de passe incorrect";

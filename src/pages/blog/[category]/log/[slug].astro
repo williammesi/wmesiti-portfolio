@@ -6,6 +6,9 @@ import { hasValidSession } from "@/lib/auth";
 import { PortableText } from "astro-portabletext";
 import type { WeeklyLog } from "@/types/sanity";
 
+// Disable prerendering/ISR for protected logs (auth check required)
+export const prerender = false;
+
 // Get params
 const { category, slug } = Astro.params;
 
