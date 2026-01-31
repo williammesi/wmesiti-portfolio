@@ -2,7 +2,6 @@
 import Layout from "../../../layouts/Layout.astro";
 import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
-import { hasValidSession } from "@/lib/auth";
 import type {
     BlogCategory,
     BlogPostPreview,
@@ -29,17 +28,8 @@ if (!categoryData) {
     return Astro.redirect("/404");
 }
 
-// Check if protected and validate session
-if (categoryData.isProtected) {
-    const isAuthenticated = await hasValidSession(
-        Astro.request,
-        category as string,
-    );
-
-    if (!isAuthenticated) {
-        return Astro.redirect(`/blog/${category}/login`);
-    }
-}
+// Note: Authentication is now handled by middleware (src/middleware.ts)
+// If user reaches this page, they're already authenticated (if category is protected)
 
 // Fetch content for this category (both posts and weekly logs)
 interface AllContent {

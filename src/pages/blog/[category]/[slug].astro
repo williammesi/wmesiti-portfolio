@@ -2,7 +2,6 @@
 import Layout from "../../../layouts/Layout.astro";
 import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
-import { hasValidSession } from "@/lib/auth";
 import { PortableText } from "astro-portabletext";
 import type { BlogPost } from "@/types/sanity";
 
@@ -27,17 +26,7 @@ if (!post) {
     return Astro.redirect("/404");
 }
 
-// Check if category is protected and validate session
-if (post.category.isProtected) {
-    const isAuthenticated = await hasValidSession(
-        Astro.request,
-        category as string,
-    );
-
-    if (!isAuthenticated) {
-        return Astro.redirect(`/blog/${category}/login`);
-    }
-}
+// Note: Authentication is now handled by middleware (src/middleware.ts)
 
 // Format date helper
 function formatDate(dateString: string): string {

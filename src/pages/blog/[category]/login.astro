@@ -6,7 +6,6 @@ import {
     verifyPassword,
     createSessionToken,
     getAuthCookieName,
-    hasValidSession,
 } from "@/lib/auth";
 import type { BlogCategory } from "@/types/sanity";
 
@@ -42,14 +41,7 @@ if (!categoryData.isProtected) {
     return Astro.redirect(`/blog/${category}`);
 }
 
-// Check if already authenticated
-const isAuthenticated = await hasValidSession(
-    Astro.request,
-    category as string,
-);
-if (isAuthenticated) {
-    return Astro.redirect(`/blog/${category}`);
-}
+// Note: Middleware now handles redirecting authenticated users away from login page
 
 // Handle form submission
 let error = "";
