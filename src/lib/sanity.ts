@@ -107,7 +107,7 @@ export const queries = {
       description,
       isProtected,
       order,
-      "postCount": count(*[_type == "blogPost" && references(^._id)])
+      "postCount": count(*[_type in ["blogPost", "weeklyLog"] && references(^._id)])
     }
   `,
 
