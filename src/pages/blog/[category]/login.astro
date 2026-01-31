@@ -2,15 +2,10 @@
 import Layout from "../../../layouts/Layout.astro";
 import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
-import {
-    verifyPassword,
-    hasValidAuth,
-    createSessionToken,
-    getAuthCookieName,
-} from "@/lib/auth-simple";
+import { verifyPassword, setAuthCookie, isAuthenticated } from "@/lib/auth";
 import type { BlogCategory } from "@/types/sanity";
 
-// Disable prerendering for authentication
+// Disable prerendering
 export const prerender = false;
 
 // Get category slug from params
@@ -35,8 +30,8 @@ if (!categoryData.isProtected) {
     return Astro.redirect(`/blog/${category}`);
 }
 
-// Check if already authenticated
-if (hasValidAuth(Astro.cookies, category as string)) {
+// If already authenticated, redirect to category page
+if (isAuthenticated(Astro.cookies, category as string)) {
     return Astro.redirect(`/blog/${category}`);
 }
 
@@ -48,31 +43,11 @@ if (Astro.request.method === "POST") {
         const password = formData.get("password") as string;
 
         if (password && categoryData.passwordHash) {
-            const isValid = await verifyPassword(
-                password,
-                categoryData.passwordHash,
-            );
+            const isValid = await verifyPassword(password, categoryData.passwordHash);
 
             if (isValid) {
-                // Create cookie manually and return with redirect
-                console.log("[Login] Password valid, creating cookie for:", category);
-                const token = createSessionToken(category as string);
-                const cookieName = getAuthCookieName(category as string);
-                const maxAge = 7 * 24 * 60 * 60; // 7 days
-                const secure = import.meta.env.PROD ? "; Secure" : "";
-                const cookieValue = `${cookieName}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
-
-                console.log("[Login] Cookie:", cookieValue);
-                console.log("[Login] Redirecting to:", `/blog/${category}`);
-
-                // Return redirect Response with Set-Cookie header
-                return new Response(null, {
-                    status: 302,
-                    headers: {
-                        "Location": `/blog/${category}`,
-                        "Set-Cookie": cookieValue,
-                    },
-                });
+                setAuthCookie(Astro.cookies, category as string);
+                return Astro.redirect(`/blog/${category}`);
             } else {
                 error = "Mot de passe incorrect";
             }
@@ -95,9 +70,7 @@ const seoData = {
 ---
 
 <Layout {...seoData}>
-    <div
-        class="w-full lg:w-9/10 mx-auto p-4 min-h-[70vh] flex items-center justify-center"
-    >
+    <div class="w-full lg:w-9/10 mx-auto p-4 min-h-[70vh] flex items-center justify-center">
         <div class="w-full max-w-md">
             <!-- Back Navigation -->
             <div class="mb-6">
@@ -124,14 +97,10 @@ const seoData = {
             </div>
 
             <!-- Login Card -->
-            <div
-                class="bg-mochasurface border border-mochaborder rounded-2xl p-8"
-            >
+            <div class="bg-mochasurface border border-mochaborder rounded-2xl p-8">
                 <!-- Lock Icon -->
                 <div class="flex justify-center mb-6">
-                    <div
-                        class="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center"
-                    >
+                    <div class="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center">
                         <svg
                             width="32"
                             height="32"
@@ -163,27 +132,20 @@ const seoData = {
                     Contenu protégé
                 </h1>
                 <p class="text-mochawhite/60 text-center mb-6">
-                    Entrez le mot de passe pour accéder à <span
-                        class="text-mochawhite font-medium"
-                        >{categoryData.title}</span
-                    >
+                    Entrez le mot de passe pour accéder à <span class="text-mochawhite font-medium">{categoryData.title}</span>
                 </p>
 
                 <!-- Error Message -->
-                {
-                    error && (
-                        <div class="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm text-center">
-                            {error}
-                        </div>
-                    )
-                }
+                {error && (
+                    <div class="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm text-center">
+                        {error}
+                    </div>
+                )}
 
                 <!-- Login Form -->
                 <form method="POST" class="space-y-4">
                     <div>
-                        <label for="password" class="sr-only"
-                            >Mot de passe</label
-                        >
+                        <label for="password" class="sr-only">Mot de passe</label>
                         <input
                             type="password"
                             id="password"

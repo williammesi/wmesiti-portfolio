@@ -2,7 +2,7 @@
 import Layout from "../../../../layouts/Layout.astro";
 import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
-import { hasValidAuth } from "@/lib/auth-simple";
+import { isAuthenticated } from "@/lib/auth";
 import { PortableText } from "astro-portabletext";
 import type { WeeklyLog } from "@/types/sanity";
 
@@ -27,9 +27,9 @@ if (!weeklyLog) {
     return Astro.redirect(`/blog/${category}/${slug}`);
 }
 
-// Check if category is protected and validate authentication
+// Check if category is protected and redirect to login if not authenticated
 if (weeklyLog.category.isProtected) {
-    if (!hasValidAuth(Astro.cookies, category as string)) {
+    if (!isAuthenticated(Astro.cookies, category as string)) {
         return Astro.redirect(`/blog/${category}/login`);
     }
 }
