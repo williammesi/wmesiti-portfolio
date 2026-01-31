@@ -45,6 +45,16 @@ export function setAuthCookie(cookies: AstroCookies, categorySlug: string): void
 }
 
 /**
+ * Generate Set-Cookie header string for manual Response creation
+ * (needed for Vercel compatibility with redirects)
+ */
+export function getAuthCookieHeader(categorySlug: string): string {
+    const cookieName = `${AUTH_COOKIE_NAME}_${categorySlug}`;
+    const secure = import.meta.env.PROD ? "; Secure" : "";
+    return `${cookieName}=authenticated; Path=/; HttpOnly; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}${secure}`;
+}
+
+/**
  * Check if user is authenticated for a specific category
  */
 export function isAuthenticated(cookies: AstroCookies, categorySlug: string): boolean {
