@@ -109,6 +109,7 @@ export async function hasValidSession(
 ): Promise<boolean> {
     const cookieHeader = request.headers.get("cookie");
     if (!cookieHeader) {
+        console.log("[Auth] No cookie header found for category:", categorySlug);
         return false;
     }
 
@@ -117,10 +118,13 @@ export async function hasValidSession(
     const token = cookies[cookieName];
 
     if (!token) {
+        console.log("[Auth] No token found for category:", categorySlug, "- Available cookies:", Object.keys(cookies));
         return false;
     }
 
-    return validateSessionToken(token, categorySlug);
+    const isValid = await validateSessionToken(token, categorySlug);
+    console.log("[Auth] Token validation result for category:", categorySlug, "- Valid:", isValid);
+    return isValid;
 }
 
 // Parse cookies from a cookie header string
@@ -151,9 +155,10 @@ export async function createAuthCookieHeader(
     // - HttpOnly = not accessible via JavaScript
     // - SameSite=Lax = CSRF protection while allowing navigation
     // - Secure in production
+    // - Path=/ for broader availability (fixes Vercel serverless issues)
     const secure = import.meta.env.PROD ? "; Secure" : "";
 
-    return `${cookieName}=${token}; Path=/blog/${categorySlug}; HttpOnly; SameSite=Lax${secure}`;
+    return `${cookieName}=${token}; Path=/; HttpOnly; SameSite=Lax${secure}`;
 }
 
 // Create a cookie header to clear authentication
@@ -161,5 +166,5 @@ export function createLogoutCookieHeader(categorySlug: string): string {
     const cookieName = getAuthCookieName(categorySlug);
     const secure = import.meta.env.PROD ? "; Secure" : "";
 
-    return `${cookieName}=; Path=/blog/${categorySlug}; HttpOnly; SameSite=Lax${secure}; Max-Age=0`;
+    return `${cookieName}=; Path=/; HttpOnly; SameSite=Lax${secure}; Max-Age=0`;
 }

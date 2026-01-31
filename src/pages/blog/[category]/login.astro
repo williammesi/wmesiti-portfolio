@@ -66,24 +66,25 @@ if (Astro.request.method === "POST") {
                     category as string,
                 );
 
-                return new Response(null, {
-                    status: 302,
-                    headers: {
-                        Location: `/blog/${category}`,
-                        "Set-Cookie": cookieHeader,
-                        "Cache-Control": "no-store, no-cache, must-revalidate",
-                        "CDN-Cache-Control": "no-store",
-                    },
-                });
+                console.log("[Auth] Setting cookie for category:", category);
+                console.log("[Auth] Cookie header:", cookieHeader);
+
+                // Set the cookie header
+                Astro.response.headers.set("Set-Cookie", cookieHeader);
+
+                // Use Astro.redirect for better Vercel compatibility
+                return Astro.redirect(`/blog/${category}`, 302);
             } else {
+                console.log("[Auth] Invalid password for category:", category);
                 error = "Mot de passe incorrect";
             }
         } else {
+            console.log("[Auth] Missing password or hash");
             error = "Veuillez entrer un mot de passe";
         }
     } catch (e) {
         error = "Une erreur est survenue";
-        console.error("Login error:", e);
+        console.error("[Auth] Login error:", e);
     }
 }
 
