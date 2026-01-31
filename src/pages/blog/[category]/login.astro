@@ -9,6 +9,13 @@ import {
 } from "@/lib/auth";
 import type { BlogCategory } from "@/types/sanity";
 
+// Disable ISR caching for this page to allow POST form submissions
+Astro.response.headers.set(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate",
+);
+Astro.response.headers.set("CDN-Cache-Control", "no-store");
+
 // Get category slug from params
 const { category } = Astro.params;
 
@@ -64,6 +71,8 @@ if (Astro.request.method === "POST") {
                     headers: {
                         Location: `/blog/${category}`,
                         "Set-Cookie": cookieHeader,
+                        "Cache-Control": "no-store, no-cache, must-revalidate",
+                        "CDN-Cache-Control": "no-store",
                     },
                 });
             } else {
