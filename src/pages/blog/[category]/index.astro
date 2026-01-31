@@ -2,13 +2,14 @@
 import Layout from "../../../layouts/Layout.astro";
 import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
+import { hasValidAuth } from "@/lib/auth-simple";
 import type {
     BlogCategory,
     BlogPostPreview,
     WeeklyLogPreview,
 } from "@/types/sanity";
 
-// Disable prerendering/ISR for protected categories (auth check required)
+// Disable prerendering
 export const prerender = false;
 
 // Get category slug from params
@@ -28,8 +29,12 @@ if (!categoryData) {
     return Astro.redirect("/404");
 }
 
-// Note: Authentication is now handled by middleware (src/middleware.ts)
-// If user reaches this page, they're already authenticated (if category is protected)
+// Check if protected and validate authentication
+if (categoryData.isProtected) {
+    if (!hasValidAuth(Astro.cookies, category as string)) {
+        return Astro.redirect(`/blog/${category}/login`);
+    }
+}
 
 // Fetch content for this category (both posts and weekly logs)
 interface AllContent {

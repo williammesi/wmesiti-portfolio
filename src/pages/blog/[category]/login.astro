@@ -4,25 +4,18 @@ import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
 import {
     verifyPassword,
-    createSessionToken,
-    getAuthCookieName,
-} from "@/lib/auth";
+    setAuthCookie,
+    hasValidAuth,
+} from "@/lib/auth-simple";
 import type { BlogCategory } from "@/types/sanity";
 
-// Disable prerendering/ISR for this authentication page
+// Disable prerendering for authentication
 export const prerender = false;
-
-// Disable ISR caching for this page to allow POST form submissions
-Astro.response.headers.set(
-    "Cache-Control",
-    "no-store, no-cache, must-revalidate",
-);
-Astro.response.headers.set("CDN-Cache-Control", "no-store");
 
 // Get category slug from params
 const { category } = Astro.params;
 
-// Fetch category data (with password hash for verification)
+// Fetch category data (with password hash)
 const categoryData = await safeAsync(
     () =>
         sanityFetch<BlogCategory | null>(queries.blogCategoryBySlug, {
@@ -41,7 +34,10 @@ if (!categoryData.isProtected) {
     return Astro.redirect(`/blog/${category}`);
 }
 
-// Note: Middleware now handles redirecting authenticated users away from login page
+// Check if already authenticated
+if (hasValidAuth(Astro.cookies, category as string)) {
+    return Astro.redirect(`/blog/${category}`);
+}
 
 // Handle form submission
 let error = "";
@@ -57,36 +53,15 @@ if (Astro.request.method === "POST") {
             );
 
             if (isValid) {
-                // Create session cookie and redirect
-                const token = await createSessionToken(category as string);
-                const cookieName = getAuthCookieName(category as string);
+                // Set authentication cookie
+                setAuthCookie(Astro.cookies, category as string);
 
-                console.log("[Auth] Setting cookie for category:", category);
-                console.log("[Auth] Cookie name:", cookieName);
-
-                // Build cookie header manually
-                // TODO : Change maxAge to something more reasonable
-                const maxAge = 1 * 60; // 1 minute in seconds
-                const secure = import.meta.env.PROD ? "; Secure" : "";
-                const cookieHeader = `${cookieName}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
-
-                console.log("[Auth] Cookie header:", cookieHeader);
-
-                // Return response with both cookie and redirect
-                // Must use Response constructor to include Set-Cookie header with redirect
-                return new Response(null, {
-                    status: 302,
-                    headers: {
-                        Location: `/blog/${category}`,
-                        "Set-Cookie": cookieHeader,
-                    },
-                });
+                // Redirect to category page
+                return Astro.redirect(`/blog/${category}`);
             } else {
-                console.log("[Auth] Invalid password for category:", category);
                 error = "Mot de passe incorrect";
             }
         } else {
-            console.log("[Auth] Missing password or hash");
             error = "Veuillez entrer un mot de passe";
         }
     } catch (e) {

@@ -2,10 +2,11 @@
 import Layout from "../../../../layouts/Layout.astro";
 import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
+import { hasValidAuth } from "@/lib/auth-simple";
 import { PortableText } from "astro-portabletext";
 import type { WeeklyLog } from "@/types/sanity";
 
-// Disable prerendering/ISR for protected logs (auth check required)
+// Disable prerendering
 export const prerender = false;
 
 // Get params
@@ -26,7 +27,12 @@ if (!weeklyLog) {
     return Astro.redirect(`/blog/${category}/${slug}`);
 }
 
-// Note: Authentication is now handled by middleware (src/middleware.ts)
+// Check if category is protected and validate authentication
+if (weeklyLog.category.isProtected) {
+    if (!hasValidAuth(Astro.cookies, category as string)) {
+        return Astro.redirect(`/blog/${category}/login`);
+    }
+}
 
 // Format date helper
 function formatDate(dateString: string): string {
