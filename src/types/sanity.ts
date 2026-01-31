@@ -71,6 +71,64 @@ export interface Challenge {
   solutionDescription: string;
 }
 
+// Blog-related interfaces
+export interface BlogCategory extends SanityDocument {
+  title: string;
+  slug: SanitySlug;
+  description?: string;
+  isProtected: boolean;
+  passwordHash?: string;
+  order?: number;
+}
+
+export interface BlogPost extends SanityDocument {
+  title: string;
+  slug: SanitySlug;
+  category: BlogCategory;
+  excerpt: string;
+  coverImage?: SanityImage;
+  content: PortableTextBlock[];
+  publishedAt: string;
+  featured: boolean;
+  order?: number;
+}
+
+// Blog preview types (without sensitive data)
+export type BlogCategoryPublic = Omit<BlogCategory, 'passwordHash'>;
+export type BlogPostPreview = Pick<BlogPost, '_id' | 'title' | 'slug' | 'excerpt' | 'coverImage' | 'publishedAt' | 'featured'> & {
+  category: Pick<BlogCategory, 'title' | 'slug' | 'isProtected'>;
+};
+
+// Weekly Log interfaces
+export interface TaskItem {
+  _key?: string;
+  taskName: string;
+  completed: boolean;
+}
+
+export interface QAItem {
+  _key?: string;
+  question: string;
+  answer?: string;
+}
+
+export interface WeeklyLog extends SanityDocument {
+  title: string;
+  slug: SanitySlug;
+  category: BlogCategory;
+  weekNumber: number;
+  publishedAt: string;
+  part1Tasks?: TaskItem[];
+  part2SupervisorQA?: QAItem[];
+  part3TeacherQA?: QAItem[];
+  part4Notes?: PortableTextBlock[];
+  order?: number;
+}
+
+export type WeeklyLogPreview = Pick<WeeklyLog, '_id' | 'title' | 'slug' | 'weekNumber' | 'publishedAt'> & {
+  category: Pick<BlogCategory, 'title' | 'slug' | 'isProtected'>;
+};
+
 // Skills and Experience interfaces
 export interface Skill extends SanityDocument {
   name: string;
@@ -197,24 +255,3 @@ export interface ImageOptions {
 // Utility types
 export type ProjectWithoutContent = Omit<Project, 'description' | 'features' | 'challenges'>;
 export type ProjectPreview = Pick<Project, '_id' | 'title' | 'slug' | 'summary' | 'status' | 'year' | 'thumbnail' | 'technologies' | 'featured'>;
-
-// Export all types for easy importing
-export type {
-  SanityDocument,
-  SanityImage,
-  SanitySlug,
-  Project,
-  Feature,
-  Challenge,
-  Skill,
-  Experience,
-  PortableTextBlock,
-  ProjectCardProps,
-  ProjectDetailProps,
-  SEOProps,
-  ApiError,
-  LoadingState,
-  ImageOptions,
-  ProjectWithoutContent,
-  ProjectPreview,
-};

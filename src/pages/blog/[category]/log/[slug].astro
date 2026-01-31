@@ -1,0 +1,375 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import { sanityFetch, queries } from "@/lib/sanity";
+import { safeAsync } from "@/utils/errorHandling";
+import { hasValidSession } from "@/lib/auth";
+import { PortableText } from "astro-portabletext";
+import type { WeeklyLog } from "@/types/sanity";
+
+// Get params
+const { category, slug } = Astro.params;
+
+// First, try to fetch as a weekly log
+const weeklyLog = await safeAsync(
+    () =>
+        sanityFetch<WeeklyLog | null>(queries.weeklyLogBySlug, {
+            slug,
+            categorySlug: category,
+        }),
+    null,
+);
+
+// If not a weekly log, redirect to blog post (fallback)
+if (!weeklyLog) {
+    return Astro.redirect(`/blog/${category}/${slug}`);
+}
+
+// Check if category is protected and validate session
+if (weeklyLog.category.isProtected) {
+    const isAuthenticated = await hasValidSession(
+        Astro.request,
+        category as string,
+    );
+
+    if (!isAuthenticated) {
+        return Astro.redirect(`/blog/${category}/login`);
+    }
+}
+
+// Format date helper
+function formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+}
+
+// SEO data
+const seoData = {
+    title: `${weeklyLog.title} - ${weeklyLog.category.title} - Blog`,
+    description: `Journal hebdomadaire - Semaine ${weeklyLog.weekNumber}`,
+    type: "article" as const,
+};
+---
+
+<Layout {...seoData}>
+    <div class="w-full lg:w-9/10 mx-auto p-4">
+        <!-- Back Navigation -->
+        <div class="mb-6">
+            <a
+                href={`/blog/${category}`}
+                class="inline-flex items-center gap-2 px-4 py-2 bg-mochasurface hover:bg-mochasurfacelight border border-mochaborder rounded-lg text-mochawhite transition-colors"
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M19 12H5M12 19L5 12L12 5"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+                Retour à {weeklyLog.category.title}
+            </a>
+        </div>
+
+        <article class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <header class="mb-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span
+                        class="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-md text-sm"
+                    >
+                        Semaine {weeklyLog.weekNumber}
+                    </span>
+                    <span class="text-mochawhite/50 text-sm">
+                        {formatDate(weeklyLog.publishedAt)}
+                    </span>
+                </div>
+
+                <h1 class="text-3xl md:text-4xl font-bold text-mochawhite mb-2">
+                    {weeklyLog.title}
+                </h1>
+            </header>
+
+            <!-- Partie 1: Tâches de la semaine -->
+            <section class="mb-8">
+                <h2
+                    class="text-xl font-bold text-mochawhite mb-4 flex items-center gap-2"
+                >
+                    <span
+                        class="w-8 h-8 bg-purple-500/20 text-purple-400 rounded-full flex items-center justify-center text-sm font-bold"
+                    >
+                        1
+                    </span>
+                    Tâches de la semaine
+                </h2>
+                <div
+                    class="bg-mochasurface border border-mochaborder rounded-xl p-4"
+                >
+                    {
+                        weeklyLog.part1Tasks &&
+                        weeklyLog.part1Tasks.length > 0 ? (
+                            <ul class="space-y-3">
+                                {weeklyLog.part1Tasks.map((task) => (
+                                    <li class="flex items-start gap-3">
+                                        <span
+                                            class={`mt-1 w-5 h-5 rounded flex items-center justify-center text-xs ${
+                                                task.completed
+                                                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                                    : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                                            }`}
+                                        >
+                                            {task.completed ? "✓" : "○"}
+                                        </span>
+                                        <span
+                                            class={`${task.completed ? "text-mochawhite/60" : "text-mochawhite"}`}
+                                        >
+                                            {task.taskName}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p class="text-mochawhite/40 italic text-center py-2">
+                                Aucune tâche définie
+                            </p>
+                        )
+                    }
+                </div>
+            </section>
+
+            <!-- Partie 2: Questions au responsable de stage -->
+            <section class="mb-8">
+                <h2
+                    class="text-xl font-bold text-mochawhite mb-4 flex items-center gap-2"
+                >
+                    <span
+                        class="w-8 h-8 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-sm font-bold"
+                    >
+                        2
+                    </span>
+                    Questions au responsable de stage
+                </h2>
+                <div
+                    class="bg-mochasurface border border-mochaborder rounded-xl overflow-hidden"
+                >
+                    {
+                        weeklyLog.part2SupervisorQA &&
+                        weeklyLog.part2SupervisorQA.length > 0 ? (
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-mochaborder">
+                                        <th class="px-4 py-3 text-left text-mochawhite/70 font-medium w-1/2">
+                                            Question
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-mochawhite/70 font-medium w-1/2">
+                                            Réponse
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {weeklyLog.part2SupervisorQA.map(
+                                        (qa, index) => (
+                                            <tr
+                                                class={
+                                                    index <
+                                                    weeklyLog.part2SupervisorQA!
+                                                        .length -
+                                                        1
+                                                        ? "border-b border-mochaborder/50"
+                                                        : ""
+                                                }
+                                            >
+                                                <td class="px-4 py-3 text-mochawhite align-top">
+                                                    {qa.question}
+                                                </td>
+                                                <td class="px-4 py-3 align-top">
+                                                    {qa.answer ? (
+                                                        <span class="text-mochawhite/80">
+                                                            {qa.answer}
+                                                        </span>
+                                                    ) : (
+                                                        <span class="text-mochawhite/40 italic">
+                                                            En attente...
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ),
+                                    )}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p class="text-mochawhite/40 italic text-center py-4">
+                                Aucune question posée
+                            </p>
+                        )
+                    }
+                </div>
+            </section>
+
+            <!-- Partie 3: Questions au superviseur-enseignant -->
+            <section class="mb-8">
+                <h2
+                    class="text-xl font-bold text-mochawhite mb-4 flex items-center gap-2"
+                >
+                    <span
+                        class="w-8 h-8 bg-orange-500/20 text-orange-400 rounded-full flex items-center justify-center text-sm font-bold"
+                    >
+                        3
+                    </span>
+                    Questions au superviseur-enseignant
+                </h2>
+                <div
+                    class="bg-mochasurface border border-mochaborder rounded-xl overflow-hidden"
+                >
+                    {
+                        weeklyLog.part3TeacherQA &&
+                        weeklyLog.part3TeacherQA.length > 0 ? (
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-mochaborder">
+                                        <th class="px-4 py-3 text-left text-mochawhite/70 font-medium w-1/2">
+                                            Question
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-mochawhite/70 font-medium w-1/2">
+                                            Réponse
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {weeklyLog.part3TeacherQA.map(
+                                        (qa, index) => (
+                                            <tr
+                                                class={
+                                                    index <
+                                                    weeklyLog.part3TeacherQA!
+                                                        .length -
+                                                        1
+                                                        ? "border-b border-mochaborder/50"
+                                                        : ""
+                                                }
+                                            >
+                                                <td class="px-4 py-3 text-mochawhite align-top">
+                                                    {qa.question}
+                                                </td>
+                                                <td class="px-4 py-3 align-top">
+                                                    {qa.answer ? (
+                                                        <span class="text-mochawhite/80">
+                                                            {qa.answer}
+                                                        </span>
+                                                    ) : (
+                                                        <span class="text-mochawhite/40 italic">
+                                                            En attente...
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ),
+                                    )}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p class="text-mochawhite/40 italic text-center py-4">
+                                Aucune question posée
+                            </p>
+                        )
+                    }
+                </div>
+            </section>
+
+            <!-- Partie 4: Notes personnelles -->
+            <section class="mb-8">
+                <h2
+                    class="text-xl font-bold text-mochawhite mb-4 flex items-center gap-2"
+                >
+                    <span
+                        class="w-8 h-8 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center text-sm font-bold"
+                    >
+                        4
+                    </span>
+                    Notes personnelles
+                </h2>
+                <div
+                    class="bg-mochasurface border border-mochaborder rounded-xl p-6 prose-notes"
+                >
+                    {
+                        weeklyLog.part4Notes &&
+                        weeklyLog.part4Notes.length > 0 ? (
+                            <PortableText value={weeklyLog.part4Notes} />
+                        ) : (
+                            <p class="text-mochawhite/40 italic text-center">
+                                Aucune note
+                            </p>
+                        )
+                    }
+                </div>
+            </section>
+        </article>
+    </div>
+</Layout>
+
+<style>
+    /* Notes section styling */
+    .prose-notes :global(h3) {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #cdd6f4;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .prose-notes :global(h4) {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #cdd6f4;
+        margin-top: 0.75rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .prose-notes :global(p) {
+        color: rgba(205, 214, 244, 0.8);
+        line-height: 1.6;
+        margin-bottom: 0.75rem;
+    }
+
+    .prose-notes :global(ul) {
+        list-style-type: disc;
+        list-style-position: inside;
+        color: rgba(205, 214, 244, 0.8);
+        margin-bottom: 0.75rem;
+    }
+
+    .prose-notes :global(ol) {
+        list-style-type: decimal;
+        list-style-position: inside;
+        color: rgba(205, 214, 244, 0.8);
+        margin-bottom: 0.75rem;
+    }
+
+    .prose-notes :global(li) {
+        margin-bottom: 0.25rem;
+    }
+
+    .prose-notes :global(strong) {
+        color: #cdd6f4;
+        font-weight: 600;
+    }
+
+    .prose-notes :global(em) {
+        font-style: italic;
+    }
+
+    .prose-notes :global(s),
+    .prose-notes :global(del) {
+        text-decoration: line-through;
+        color: rgba(205, 214, 244, 0.5);
+    }
+</style>
