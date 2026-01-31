@@ -74,6 +74,14 @@ export async function validateSessionToken(
             return false;
         }
 
+        // Check if token has expired (7 days = 604800000 ms)
+        const tokenAge = Date.now() - parseInt(timestamp);
+        const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+        if (tokenAge > MAX_AGE || tokenAge < 0) {
+            console.log("[Auth] Token expired or invalid timestamp for category:", categorySlug);
+            return false;
+        }
+
         // Recreate the signature to verify
         const payload = `${slug}:${timestamp}`;
         const secret = import.meta.env.BLOG_AUTH_SECRET || "portfolio-blog-auth-2024";
@@ -143,22 +151,23 @@ function parseCookies(cookieHeader: string): Record<string, string> {
 }
 
 // Create a Set-Cookie header value for authentication
-// Session cookie (no Max-Age = expires when browser closes)
+// Cookie expires in 7 days (matches token expiration)
 export async function createAuthCookieHeader(
     categorySlug: string
 ): Promise<string> {
     const token = await createSessionToken(categorySlug);
     const cookieName = getAuthCookieName(categorySlug);
 
-    // Session cookie settings:
-    // - No Max-Age or Expires = session cookie (deleted when browser closes)
+    // Cookie settings:
+    // - Max-Age = 7 days (604800 seconds) - matches token expiration
     // - HttpOnly = not accessible via JavaScript
     // - SameSite=Lax = CSRF protection while allowing navigation
     // - Secure in production
     // - Path=/ for broader availability (fixes Vercel serverless issues)
     const secure = import.meta.env.PROD ? "; Secure" : "";
+    const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
 
-    return `${cookieName}=${token}; Path=/; HttpOnly; SameSite=Lax${secure}`;
+    return `${cookieName}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
 }
 
 // Create a cookie header to clear authentication

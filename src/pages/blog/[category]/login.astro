@@ -4,7 +4,8 @@ import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
 import {
     verifyPassword,
-    createAuthCookieHeader,
+    createSessionToken,
+    getAuthCookieName,
     hasValidSession,
 } from "@/lib/auth";
 import type { BlogCategory } from "@/types/sanity";
@@ -62,17 +63,24 @@ if (Astro.request.method === "POST") {
 
             if (isValid) {
                 // Create session cookie and redirect
-                const cookieHeader = await createAuthCookieHeader(
-                    category as string,
-                );
+                const token = await createSessionToken(category as string);
+                const cookieName = getAuthCookieName(category as string);
 
                 console.log("[Auth] Setting cookie for category:", category);
-                console.log("[Auth] Cookie header:", cookieHeader);
+                console.log("[Auth] Cookie name:", cookieName);
 
-                // Set the cookie header
-                Astro.response.headers.set("Set-Cookie", cookieHeader);
+                // Use Astro's cookies API to set the cookie
+                // TODO : Change maxAge to something more reasonable
+                const maxAge = 1 * 60; // 1 minute in seconds
+                Astro.cookies.set(cookieName, token, {
+                    path: "/",
+                    httpOnly: true,
+                    sameSite: "lax",
+                    secure: import.meta.env.PROD,
+                    maxAge: maxAge,
+                });
 
-                // Use Astro.redirect for better Vercel compatibility
+                // Redirect after setting cookie
                 return Astro.redirect(`/blog/${category}`, 302);
             } else {
                 console.log("[Auth] Invalid password for category:", category);
