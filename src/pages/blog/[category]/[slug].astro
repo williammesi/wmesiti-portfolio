@@ -162,60 +162,119 @@ const components = {
 </Layout>
 
 <style>
-    /* Portable Text styling */
+    /* Portable Text styling - using CSS variables for custom colors */
     .prose :global(h2) {
-        @apply text-2xl font-bold text-mochawhite mt-8 mb-4;
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 700;
+        color: #cdd6f4;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
     }
 
     .prose :global(h3) {
-        @apply text-xl font-bold text-mochawhite mt-6 mb-3;
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        font-weight: 700;
+        color: #cdd6f4;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
     }
 
     .prose :global(h4) {
-        @apply text-lg font-semibold text-mochawhite mt-4 mb-2;
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        font-weight: 600;
+        color: #cdd6f4;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     .prose :global(p) {
-        @apply text-mochawhite/80 leading-relaxed mb-4;
+        color: rgba(205, 214, 244, 0.8);
+        line-height: 1.75;
+        margin-bottom: 1rem;
     }
 
     .prose :global(blockquote) {
-        @apply border-l-4 border-mochaborder pl-4 italic text-mochawhite/60 my-6;
+        border-left: 4px solid #313244;
+        padding-left: 1rem;
+        font-style: italic;
+        color: rgba(205, 214, 244, 0.6);
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .prose :global(code) {
-        @apply bg-mochasurface px-2 py-1 rounded text-sm font-mono text-mochawhite;
+        background-color: #1e1e2e;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        font-family: ui-monospace, monospace;
+        color: #cdd6f4;
     }
 
     .prose :global(pre) {
-        @apply bg-mochasurface border border-mochaborder rounded-lg p-4 overflow-x-auto my-6;
+        background-color: #1e1e2e;
+        border: 1px solid #313244;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        overflow-x: auto;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .prose :global(pre code) {
-        @apply bg-transparent p-0;
+        background-color: transparent;
+        padding: 0;
     }
 
     .prose :global(ul) {
-        @apply list-disc list-inside text-mochawhite/80 mb-4 space-y-2;
+        list-style-type: disc;
+        list-style-position: inside;
+        color: rgba(205, 214, 244, 0.8);
+        margin-bottom: 1rem;
+    }
+
+    .prose :global(ul li) {
+        margin-bottom: 0.5rem;
     }
 
     .prose :global(ol) {
-        @apply list-decimal list-inside text-mochawhite/80 mb-4 space-y-2;
+        list-style-type: decimal;
+        list-style-position: inside;
+        color: rgba(205, 214, 244, 0.8);
+        margin-bottom: 1rem;
+    }
+
+    .prose :global(ol li) {
+        margin-bottom: 0.5rem;
     }
 
     .prose :global(a) {
-        @apply text-blue-400 hover:text-blue-300 underline;
+        color: #60a5fa;
+        text-decoration: underline;
+    }
+
+    .prose :global(a:hover) {
+        color: #93c5fd;
     }
 
     .prose :global(img) {
-        @apply rounded-lg my-6;
+        border-radius: 0.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .prose :global(figure) {
-        @apply my-6;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .prose :global(figcaption) {
-        @apply text-center text-mochawhite/50 text-sm mt-2;
+        text-align: center;
+        color: rgba(205, 214, 244, 0.5);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
     }
 </style>

@@ -190,4 +190,75 @@ export const queries = {
       "slug": slug.current
     }
   `,
+
+  // ===== Weekly Log Queries =====
+
+  // Get all weekly logs for a category
+  weeklyLogsByCategory: `
+    *[_type == "weeklyLog" && category->slug.current == $categorySlug] | order(weekNumber desc) {
+      _id,
+      title,
+      slug,
+      weekNumber,
+      publishedAt,
+      category->{
+        title,
+        slug,
+        isProtected
+      }
+    }
+  `,
+
+  // Get single weekly log by slug
+  weeklyLogBySlug: `
+    *[_type == "weeklyLog" && slug.current == $slug && category->slug.current == $categorySlug][0] {
+      _id,
+      title,
+      slug,
+      weekNumber,
+      publishedAt,
+      part1Tasks,
+      part2SupervisorQA,
+      part3TeacherQA,
+      part4Notes,
+      category->{
+        _id,
+        title,
+        slug,
+        isProtected
+      }
+    }
+  `,
+
+  // Get all weekly log paths for static generation
+  weeklyLogPaths: `
+    *[_type == "weeklyLog"] {
+      "slug": slug.current,
+      "categorySlug": category->slug.current
+    }
+  `,
+
+  // Get all content for a category (both blog posts and weekly logs)
+  allContentByCategory: `
+    {
+      "posts": *[_type == "blogPost" && category->slug.current == $categorySlug] | order(publishedAt desc) {
+        _id,
+        _type,
+        title,
+        slug,
+        excerpt,
+        coverImage,
+        publishedAt,
+        featured
+      },
+      "weeklyLogs": *[_type == "weeklyLog" && category->slug.current == $categorySlug] | order(weekNumber desc) {
+        _id,
+        _type,
+        title,
+        slug,
+        weekNumber,
+        publishedAt
+      }
+    }
+  `,
 } as const;

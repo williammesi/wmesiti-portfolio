@@ -7,6 +7,7 @@ import { project } from "./src/types/project";
 import { skillCategory } from "./src/types/skillcategory";
 import { blogCategory } from "./src/types/blogCategory";
 import { blogPost } from "./src/types/blogPost";
+import { weeklyLog } from "./src/types/weeklyLog";
 
 export default defineConfig({
   name: "wmesiti-portfolio-cms",
@@ -15,6 +16,6 @@ export default defineConfig({
   dataset: "production",
   plugins: [structureTool(), visionTool(), codeInput()],
   schema: {
-    types: [experience, project, skillCategory, blogCategory, blogPost],
+    types: [experience, project, skillCategory, blogCategory, blogPost, weeklyLog],
   },
 });

@@ -99,6 +99,36 @@ export type BlogPostPreview = Pick<BlogPost, '_id' | 'title' | 'slug' | 'excerpt
   category: Pick<BlogCategory, 'title' | 'slug' | 'isProtected'>;
 };
 
+// Weekly Log interfaces
+export interface TaskItem {
+  _key?: string;
+  taskName: string;
+  completed: boolean;
+}
+
+export interface QAItem {
+  _key?: string;
+  question: string;
+  answer?: string;
+}
+
+export interface WeeklyLog extends SanityDocument {
+  title: string;
+  slug: SanitySlug;
+  category: BlogCategory;
+  weekNumber: number;
+  publishedAt: string;
+  part1Tasks?: TaskItem[];
+  part2SupervisorQA?: QAItem[];
+  part3TeacherQA?: QAItem[];
+  part4Notes?: PortableTextBlock[];
+  order?: number;
+}
+
+export type WeeklyLogPreview = Pick<WeeklyLog, '_id' | 'title' | 'slug' | 'weekNumber' | 'publishedAt'> & {
+  category: Pick<BlogCategory, 'title' | 'slug' | 'isProtected'>;
+};
+
 // Skills and Experience interfaces
 export interface Skill extends SanityDocument {
   name: string;
