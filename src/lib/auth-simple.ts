@@ -70,6 +70,9 @@ export function setAuthCookie(cookies: AstroCookies, categorySlug: string) {
     const cookieName = getAuthCookieName(categorySlug);
     const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
 
+    console.log("[Auth] Setting cookie:", cookieName, "with token:", token.substring(0, 20) + "...");
+    console.log("[Auth] Cookie options:", { path: "/", httpOnly: true, sameSite: "lax", secure: import.meta.env.PROD, maxAge });
+
     cookies.set(cookieName, token, {
         path: "/",
         httpOnly: true,
@@ -77,6 +80,8 @@ export function setAuthCookie(cookies: AstroCookies, categorySlug: string) {
         secure: import.meta.env.PROD,
         maxAge: maxAge,
     });
+
+    console.log("[Auth] Cookie set complete");
 }
 
 // Check if user has valid authentication cookie

@@ -4,8 +4,9 @@ import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
 import {
     verifyPassword,
-    setAuthCookie,
     hasValidAuth,
+    createSessionToken,
+    getAuthCookieName,
 } from "@/lib/auth-simple";
 import type { BlogCategory } from "@/types/sanity";
 
@@ -53,11 +54,25 @@ if (Astro.request.method === "POST") {
             );
 
             if (isValid) {
-                // Set authentication cookie
-                setAuthCookie(Astro.cookies, category as string);
+                // Create cookie manually and return with redirect
+                console.log("[Login] Password valid, creating cookie for:", category);
+                const token = createSessionToken(category as string);
+                const cookieName = getAuthCookieName(category as string);
+                const maxAge = 7 * 24 * 60 * 60; // 7 days
+                const secure = import.meta.env.PROD ? "; Secure" : "";
+                const cookieValue = `${cookieName}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
 
-                // Redirect to category page
-                return Astro.redirect(`/blog/${category}`);
+                console.log("[Login] Cookie:", cookieValue);
+                console.log("[Login] Redirecting to:", `/blog/${category}`);
+
+                // Return redirect Response with Set-Cookie header
+                return new Response(null, {
+                    status: 302,
+                    headers: {
+                        "Location": `/blog/${category}`,
+                        "Set-Cookie": cookieValue,
+                    },
+                });
             } else {
                 error = "Mot de passe incorrect";
             }
