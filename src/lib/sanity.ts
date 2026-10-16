@@ -92,7 +92,8 @@ export const queries = {
   // Get all project slugs for static paths
   projectSlugs: `
     *[_type == "project"] {
-      "slug": slug.current
+      "slug": slug.current,
+      _updatedAt
     }
   `,
 
@@ -125,7 +126,11 @@ export const queries = {
       "slug": slug.current,
       language,
       updatedAt,
-      publishedAt
+      publishedAt,
+      externalCanonicalUrl,
+      coverImage,
+      "categorySlug": category->slug.current,
+      "tagSlugs": coalesce(tags[]->slug.current, [])
     }
   `,
 

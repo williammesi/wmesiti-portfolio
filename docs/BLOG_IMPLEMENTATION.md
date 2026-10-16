@@ -2,7 +2,7 @@
 
 ## Repository assessment
 
-- **Runtime:** Astro 5 in server mode. Vercel is the default adapter, with the Node adapter selected on Railway. Individual public blog routes can still be prerendered.
+- **Runtime:** Astro 5 in server mode with the standalone Node adapter on Railway. Public blog routes are prerendered.
 - **CMS:** Sanity 5 is embedded at `/admin` through `@sanity/astro`. The public client uses the published perspective and no write token.
 - **UI:** Tailwind CSS 4 and a Catppuccin Mocha-inspired dark palette. The shared `Layout` and `Navbar` are retained.
 - **Existing blog:** The former category/password/weekly-log implementation was an SSR-only internship journal. It is replaced rather than migrated. Its remote Sanity records are not deleted.
@@ -22,7 +22,7 @@
 ## Build and publication workflow
 
 1. Create and publish an article in Sanity Studio.
-2. Trigger a deployment (manually, by pushing, or with a Sanity webhook targeting a Vercel/Railway deploy hook).
+2. Trigger a Railway deployment manually, by pushing, or with a Sanity publication webhook.
 3. `npm run build` generates public pages and then builds the Pagefind index in `dist/client/pagefind`.
 
 Only published documents with a publication date at or before build time are queried, so drafts cannot be generated, indexed, or added to the sitemap.
@@ -43,7 +43,7 @@ Supported public variables:
 PUBLIC_SANITY_PROJECT_ID=9bdbnjzy
 PUBLIC_SANITY_DATASET=production
 PUBLIC_SANITY_API_VERSION=2025-09-23
-PUBLIC_SITE_URL=https://wmesiti-portfolio.vercel.app
+PUBLIC_SITE_URL=https://wmesiti-tech.com
 ```
 
 No privileged Sanity token is needed or exposed. If content must appear immediately after publication, configure a Sanity webhook to call the hosting provider's deploy hook.
@@ -57,7 +57,7 @@ No privileged Sanity token is needed or exposed. If content must appear immediat
 ## Verification
 
 - `npx sanity schema validate`: passed with no schema errors or warnings.
-- `npm run build`: passed, including French/English route prerendering, Pagefind generation, and copying its assets into Vercel's static output.
+- `npm run build`: passed, including French/English route prerendering and Pagefind generation for Railway's `dist/client` static directory.
 - Local production-page audit: Accessibility 96, Best Practices 100, SEO 100. The remaining audit finding is a low-contrast secondary-text instance inherited from the site's visual palette.
 - `astro check` was evaluated but currently fails on pre-existing errors in unrelated files such as `ProjectDetail.astro`, `404.astro`, and the Vite dependency types. No diagnostic was reported in the new blog files.
 - No new `article` documents currently exist in the production dataset, so the built indexes correctly show their localized empty state. A representative rich-content article must be published before the content-specific acceptance scenarios can be exercised end to end.

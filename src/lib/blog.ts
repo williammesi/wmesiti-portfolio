@@ -6,7 +6,7 @@ import type {
   PortableTextNode,
 } from "@/types/sanity";
 
-export const SITE_URL = import.meta.env.PUBLIC_SITE_URL || "https://wmesiti-portfolio.vercel.app";
+export const SITE_URL = import.meta.env.PUBLIC_SITE_URL || "https://wmesiti-tech.com";
 
 export const locales: Record<BlogLocale, {
   language: BlogLanguage;

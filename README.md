@@ -80,11 +80,7 @@ The project uses Sanity for content management. Access the studio at `/admin` to
 
 ## 🚀 Deployment
 
-The site is optimized for Vercel deployment with:
-- Automatic builds on push
-- Edge functions for dynamic content
-- Image optimization
-- Web analytics integration
+The site is deployed on Railway at [wmesiti-tech.com](https://wmesiti-tech.com) using Astro's standalone Node adapter. See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for environment variables, domain configuration, and the publication workflow.
 
 ## 📱 Responsive Design
 
@@ -187,11 +183,7 @@ Le projet utilise Sanity pour la gestion de contenu. Accédez au studio à `/adm
 
 ## 🚀 Déploiement
 
-Le site est optimisé pour le déploiement Vercel avec :
-- Builds automatiques lors des push
-- Fonctions Edge pour le contenu dynamique
-- Optimisation d'images
-- Intégration d'analytics web
+Le site est déployé sur Railway à l'adresse [wmesiti-tech.com](https://wmesiti-tech.com) avec l'adaptateur Node autonome d'Astro. Consultez [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) pour la configuration du domaine, les variables d'environnement et le processus de publication.
 
 ## 📱 Design Réactif
 

@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist/client && node scripts/copy-pagefind.mjs",
+    "build": "astro build && pagefind --site dist/client",
     "preview": "astro preview",
     "start": "node ./dist/server/entry.mjs",
     "astro": "astro"
@@ -12,8 +12,6 @@
   "dependencies": {
     "@astrojs/node": "^9.5.2",
     "@astrojs/react": "^4.3.1",
-    "@astrojs/sitemap": "^3.7.0",
-    "@astrojs/vercel": "^9.0.4",
     "@astrojs/vue": "^5.1.1",
     "@material-tailwind/react": "^2.1.10",
     "@sanity/astro": "^3.2.10",

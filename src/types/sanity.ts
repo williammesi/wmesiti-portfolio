@@ -233,6 +233,10 @@ export interface SEOProps {
   publishedAt?: string;
   updatedAt?: string;
   author?: string;
+  imageAlt?: string;
+  keywords?: string[];
+  articleSection?: string;
+  breadcrumbs?: Array<{ name: string; url: string }>;
 }
 
 // Error handling types

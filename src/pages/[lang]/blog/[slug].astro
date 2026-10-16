@@ -41,11 +41,15 @@ const copy = locales[locale];
 const headings = articleHeadings(article.body);
 const canonical = article.externalCanonicalUrl || absoluteUrl(articleUrl(article));
 const translationLocale = article.translation?.language === "fr-CA" ? "fr" : "en";
-const alternates = [
+const languageAlternates = [
   { lang: article.language, href: absoluteUrl(articleUrl(article)) },
   ...(article.translation ? [{ lang: article.translation.language, href: absoluteUrl(`/${translationLocale}/blog/${article.translation.slug}`) }] : []),
 ];
+const frenchAlternate = languageAlternates.find((alternate) => alternate.lang === "fr-CA")?.href || absoluteUrl(articleUrl(article));
+const alternates = [...languageAlternates, { lang: "x-default", href: frenchAlternate }];
 const shareImage = imageUrl(article.socialImage?.asset?._ref || article.coverImage?.asset?._ref, 1200);
+const categoryTitle = article.category ? localizedTitle(article.category, locale) : undefined;
+const tagTitles = article.tags.map((tag) => localizedTitle(tag, locale));
 ---
 
 <Layout
@@ -59,6 +63,15 @@ const shareImage = imageUrl(article.socialImage?.asset?._ref || article.coverIma
   publishedAt={article.publishedAt}
   updatedAt={article.updatedAt}
   author={article.author}
+  imageAlt={article.socialImage?.alt || article.coverImage?.alt || article.title}
+  keywords={tagTitles}
+  articleSection={categoryTitle}
+  breadcrumbs={[
+    { name: locale === "fr" ? "Accueil" : "Home", url: "/" },
+    { name: copy.title, url: `/${locale}/blog` },
+    ...(article.category ? [{ name: categoryTitle!, url: `/${locale}/blog/category/${article.category.slug}` }] : []),
+    { name: article.title, url: articleUrl(article) },
+  ]}
   bodyClass="article-page"
 >
   <article class="article-layout" data-pagefind-body data-pagefind-filter={`language:${locale}`}>

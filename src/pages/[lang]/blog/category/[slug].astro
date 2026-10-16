@@ -24,8 +24,21 @@ if (!category) return Astro.redirect("/404");
 const articles = allArticles.filter((article) => article.category?.slug === category.slug);
 const title = localizedTitle(category, locale);
 const description = localizedDescription(category, locale) || (locale === "fr" ? `Articles dans ${title}` : `Articles in ${title}`);
+const localizedPath = `/${locale}/blog/category/${category.slug}`;
 ---
-<Layout title={`${title} — ${locales[locale].title}`} description={description} lang={language} canonical={absoluteUrl(`/${locale}/blog/category/${category.slug}`)} pagefindIgnore>
+<Layout
+  title={`${title} — ${locales[locale].title}`}
+  description={description}
+  lang={language}
+  canonical={absoluteUrl(localizedPath)}
+  noindex={articles.length === 0}
+  breadcrumbs={[
+    { name: locale === "fr" ? "Accueil" : "Home", url: "/" },
+    { name: locales[locale].title, url: `/${locale}/blog` },
+    { name: title, url: localizedPath },
+  ]}
+  pagefindIgnore
+>
   <div class="blog-shell taxonomy-page">
     <a href={`/${locale}/blog`} class="back-link">← {locales[locale].back}</a>
     <header><p class="eyebrow">{locale === "fr" ? "Catégorie" : "Category"}</p><h1>{title}</h1><p>{description}</p></header>

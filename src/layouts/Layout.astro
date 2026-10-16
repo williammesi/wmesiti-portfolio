@@ -22,6 +22,10 @@ const {
   publishedAt,
   updatedAt,
   author,
+  imageAlt,
+  keywords,
+  articleSection,
+  breadcrumbs,
   bodyClass = "",
   pagefindIgnore = false,
 } = Astro.props;
@@ -41,12 +45,16 @@ const {
 			url={url}
 			type={type}
 			noindex={noindex}
-			canonical={canonical || Astro.url.href}
+			canonical={canonical}
 			lang={lang}
 			alternates={alternates}
 			publishedAt={publishedAt}
 			updatedAt={updatedAt}
 			author={author}
+			imageAlt={imageAlt}
+			keywords={keywords}
+			articleSection={articleSection}
+			breadcrumbs={breadcrumbs}
 		/>
 
 		<!-- Fonts with optimized loading -->
