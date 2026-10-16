@@ -9,6 +9,7 @@ import {
   languageFromLocale, locales, localizedTitle, relatedArticles,
 } from "@/lib/blog";
 import type { Article, ArticlePreview, BlogLocale } from "@/types/sanity";
+import { homePath } from "@/lib/i18n";
 
 export const prerender = true;
 
@@ -50,6 +51,10 @@ const alternates = [...languageAlternates, { lang: "x-default", href: frenchAlte
 const shareImage = imageUrl(article.socialImage?.asset?._ref || article.coverImage?.asset?._ref, 1200);
 const categoryTitle = article.category ? localizedTitle(article.category, locale) : undefined;
 const tagTitles = article.tags.map((tag) => localizedTitle(tag, locale));
+// Without a translation, the toggle falls back to the other language's blog index.
+const alternateHref = article.translation
+  ? `/${translationLocale}/blog/${article.translation.slug}`
+  : `/${locale === "fr" ? "en" : "fr"}/blog`;
 ---
 
 <Layout
@@ -66,8 +71,9 @@ const tagTitles = article.tags.map((tag) => localizedTitle(tag, locale));
   imageAlt={article.socialImage?.alt || article.coverImage?.alt || article.title}
   keywords={tagTitles}
   articleSection={categoryTitle}
+  alternateHref={alternateHref}
   breadcrumbs={[
-    { name: locale === "fr" ? "Accueil" : "Home", url: "/" },
+    { name: locale === "fr" ? "Accueil" : "Home", url: homePath(language) },
     { name: copy.title, url: `/${locale}/blog` },
     ...(article.category ? [{ name: categoryTitle!, url: `/${locale}/blog/category/${article.category.slug}` }] : []),
     { name: article.title, url: articleUrl(article) },
@@ -78,14 +84,6 @@ const tagTitles = article.tags.map((tag) => localizedTitle(tag, locale));
     <header class="article-header">
       <div class="article-topline">
         <a href={`/${locale}/blog`} class="back-link"><span aria-hidden="true">←</span> {copy.back}</a>
-        <nav class="language-switcher" aria-label={locale === "fr" ? "Changer de langue" : "Change language"}>
-          <span aria-current="page">{locale.toUpperCase()}</span>
-          {article.translation ? (
-            <a href={`/${translationLocale}/blog/${article.translation.slug}`}>{translationLocale.toUpperCase()}</a>
-          ) : (
-            <span title={copy.translationUnavailable} aria-label={copy.translationUnavailable}>{locale === "fr" ? "EN" : "FR"} · —</span>
-          )}
-        </nav>
       </div>
 
       {article.category && (

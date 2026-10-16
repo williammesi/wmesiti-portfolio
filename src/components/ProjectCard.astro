@@ -1,8 +1,10 @@
 ---
 import { PROJECT_STATUS } from '@/types/sanity';
+import { projectPath, t, type SiteLanguage } from '@/lib/i18n';
 
 // Accept project data as props
 interface Props {
+  lang?: SiteLanguage;
   project: {
     _id: string;
     title: string;
@@ -22,16 +24,17 @@ interface Props {
   }
 }
 
-const { project } = Astro.props;
+const { project, lang = "fr-CA" } = Astro.props;
 
 // Get image URL from Sanity (legacy format that works)
 const thumbnailUrl = `https://cdn.sanity.io/images/9bdbnjzy/production/${project.thumbnail.asset._ref.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`;
 
 // Status configuration from types
 const statusConfig = PROJECT_STATUS[project.status];
+const statusLabel = t(lang).projects.status[project.status];
 ---
 
-<a href={`/projects/${project.slug.current}`} class="block">
+<a href={projectPath(lang, project.slug.current)} class="block">
   <div class="flex flex-col items-center rounded-4xl hover:scale-105 transition-transform duration-200 cursor-pointer">
     <img src={thumbnailUrl} alt={project.thumbnail.alt || project.title} class="w-full h-[300px] object-contain" />
 
@@ -40,7 +43,7 @@ const statusConfig = PROJECT_STATUS[project.status];
         <h3 class="text-lg text-center font-semibold text-mochawhite">{project.title}</h3>
 
           <span class={`px-2 py-1 rounded-md text-xs border ${statusConfig.className}`}>
-            {statusConfig.label}
+            {statusLabel}
           </span>
           <span class="text-xs text-mochawhite/50">{project.year}</span>
 

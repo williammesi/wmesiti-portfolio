@@ -31,11 +31,25 @@ export const project = {
       validation: (Rule: any) => Rule.required(),
     },
     {
+      name: "summaryEn",
+      title: "Résumé (English)",
+      type: "text",
+      rows: 3,
+      description: "Optionnel — le résumé en français est utilisé si vide",
+    },
+    {
       name: "description",
       title: "Description",
       type: "text",
       rows: 3,
       validation: (Rule: any) => Rule.required(),
+    },
+    {
+      name: "descriptionEn",
+      title: "Description (English)",
+      type: "text",
+      rows: 3,
+      description: "Optionnel — la description en français est utilisée si vide",
     },
     {
       name: "status",
@@ -128,6 +142,16 @@ export const project = {
                 rows: "3",
               },
             },
+            {
+              name: "nameEn",
+              title: "Nom de la fonctionnalité (English)",
+              type: "string",
+            },
+            {
+              name: "descriptionEn",
+              title: "Description de la fonctionnalité (English)",
+              type: "string",
+            },
 
             {
               name: "image",
@@ -183,6 +207,26 @@ export const project = {
               options: {
                 rows: "3",
               },
+            },
+            {
+              name: "challengeNameEn",
+              title: "Nom du défi (English)",
+              type: "string",
+            },
+            {
+              name: "challengeDescriptionEn",
+              title: "Description du défi (English)",
+              type: "string",
+            },
+            {
+              name: "solutionNameEn",
+              title: "Nom de la solution (English)",
+              type: "string",
+            },
+            {
+              name: "solutionDescriptionEn",
+              title: "Description de la solution (English)",
+              type: "string",
             },
           ],
           preview: {

@@ -1,3 +1,19 @@
+// Rich-text configuration shared by experience and education descriptions
+export const timelineDescriptionBlock = {
+  type: "block",
+  styles: [{ title: "Normal", value: "normal" }],
+  lists: [
+    { title: "Bullet", value: "bullet" },
+    { title: "Number", value: "number" },
+  ],
+  marks: {
+    decorators: [
+      { title: "Strong", value: "strong" },
+      { title: "Emphasis", value: "em" },
+    ],
+  },
+};
+
 // Experience document type
 export const experience = {
   name: "experience",
@@ -15,6 +31,12 @@ export const experience = {
       title: "Poste",
       type: "string",
       validation: (Rule: any) => Rule.required(),
+    },
+    {
+      name: "positionEn",
+      title: "Poste (English)",
+      type: "string",
+      description: "Optionnel — le poste en français est utilisé si vide",
     },
     {
       name: "logo",
@@ -47,22 +69,14 @@ export const experience = {
       name: "description",
       title: "Description",
       type: "array",
-      of: [
-        {
-          type: "block",
-          styles: [{ title: "Normal", value: "normal" }],
-          lists: [
-            { title: "Bullet", value: "bullet" },
-            { title: "Number", value: "number" },
-          ],
-          marks: {
-            decorators: [
-              { title: "Strong", value: "strong" },
-              { title: "Emphasis", value: "em" },
-            ],
-          },
-        },
-      ],
+      of: [timelineDescriptionBlock],
+    },
+    {
+      name: "descriptionEn",
+      title: "Description (English)",
+      type: "array",
+      description: "Optionnel — la description en français est utilisée si vide",
+      of: [timelineDescriptionBlock],
     },
     {
       name: "skills",

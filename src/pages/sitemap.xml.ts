@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { imageUrl, SITE_URL } from "@/lib/blog";
 import { queries, sanityFetch } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
+import { projectPath } from "@/lib/i18n";
 
 export const prerender = true;
 
@@ -48,12 +49,13 @@ export const GET: APIRoute = async () => {
 
   const entries: SitemapEntry[] = [
     { path: "/" },
+    { path: "/en" },
     { path: "/fr/blog", lastmod: newestDate(frenchArticles) },
     { path: "/en/blog", lastmod: newestDate(englishArticles) },
-    ...projects.map((project) => ({
-      path: `/projects/${project.slug}`,
+    ...projects.flatMap((project) => (["fr-CA", "en"] as const).map((lang) => ({
+      path: projectPath(lang, project.slug),
       lastmod: project._updatedAt,
-    })),
+    }))),
     ...articles.map((article) => ({
       path: `/${article.language === "fr-CA" ? "fr" : "en"}/blog/${article.slug}`,
       lastmod: article.updatedAt || article.publishedAt,

@@ -5,6 +5,7 @@ import { queries, sanityFetch } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
 import { absoluteUrl, languageFromLocale, locales, localizedTitle } from "@/lib/blog";
 import type { ArticlePreview, ArticleTaxonomy, BlogLocale } from "@/types/sanity";
+import { homePath } from "@/lib/i18n";
 
 export const prerender = true;
 export async function getStaticPaths() {
@@ -32,7 +33,7 @@ const localizedPath = `/${locale}/blog/tag/${tag.slug}`;
   canonical={absoluteUrl(localizedPath)}
   noindex={articles.length === 0}
   breadcrumbs={[
-    { name: locale === "fr" ? "Accueil" : "Home", url: "/" },
+    { name: locale === "fr" ? "Accueil" : "Home", url: homePath(language) },
     { name: locales[locale].title, url: `/${locale}/blog` },
     { name: `#${title}`, url: localizedPath },
   ]}

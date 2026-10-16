@@ -1,52 +1,7 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import ProjectDetail from '../../components/ProjectDetail.astro';
-import { sanityFetch, queries } from '@/lib/sanity';
-import { safeAsync } from '@/utils/errorHandling';
-import type { Project } from '@/types/sanity';
-
-// Get all project slugs for static generation
-export async function getStaticPaths() {
-  const projects = await safeAsync(
-    () => sanityFetch<{ slug: string }[]>(queries.projectSlugs),
-    []
-  );
-
-  return projects.map((project) => ({
-    params: { slug: project.slug },
-    props: { slug: project.slug }
-  }));
-}
+import ProjectPage from '@/components/ProjectPage.astro';
 
 const { slug } = Astro.params;
-
-// Fetch project data for SEO
-const project = await safeAsync(
-  () => sanityFetch<Project>(queries.projectBySlug, { slug }),
-  null
-);
-
-// SEO data for project page
-const seoData = project ? {
-  title: `${project.title} - William's Portfolio`,
-  description: project.summary || project.description?.substring(0, 160),
-  type: "article" as const,
-} : undefined;
 ---
 
-<Layout {...seoData}>
-  <div class="w-full lg:w-9/10 mx-auto">
-    <!-- Back Navigation -->
-    <div class="p-4 mb-4">
-      <a href="/#projects"
-         class="inline-flex items-center gap-2 px-4 py-2 bg-mochasurface hover:bg-mochasurfacelight border border-mochaborder rounded-lg text-mochawhite transition-colors">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Retour aux Projets
-      </a>
-    </div>
-
-    <ProjectDetail slug={slug} />
-  </div>
-</Layout>
+<ProjectPage slug={slug!} lang="fr-CA" />

@@ -1,0 +1,39 @@
+---
+import { isEnglish, type SiteLanguage } from "@/lib/i18n";
+
+interface Props {
+    lang: SiteLanguage;
+    href: string;
+    label: string;
+}
+
+const { lang, href, label } = Astro.props;
+const english = isEnglish(lang);
+const options = [
+    { code: "FR", active: !english },
+    { code: "EN", active: english },
+];
+---
+
+<a
+    href={href}
+    hreflang={english ? "fr-CA" : "en"}
+    lang={english ? "fr-CA" : "en"}
+    aria-label={label}
+    title={label}
+    class="group inline-flex items-center h-9 p-1 gap-0.5 rounded-md bg-mochasurface border border-mochaborder hover:border-indigo-400/50 transition-colors"
+>
+    {options.map((option) => (
+        <span
+            aria-hidden="true"
+            class:list={[
+                "inline-flex items-center justify-center h-full min-w-8 px-2 rounded text-xs font-semibold tracking-wider transition-colors",
+                option.active
+                    ? "bg-indigo-500 text-white"
+                    : "text-mochawhite/60 group-hover:text-mochawhite",
+            ]}
+        >
+            {option.code}
+        </span>
+    ))}
+</a>

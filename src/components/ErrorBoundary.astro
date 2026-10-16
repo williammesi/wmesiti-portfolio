@@ -1,21 +1,27 @@
 ---
 import type { ApiError } from '@/types/sanity';
+import { homePath, isEnglish, type SiteLanguage } from '@/lib/i18n';
 
 interface Props {
   error?: ApiError;
   fallback?: string;
   showDetails?: boolean;
   onRetry?: () => void;
+  lang?: SiteLanguage;
 }
+
+const { lang = "fr-CA" } = Astro.props;
+const en = isEnglish(lang);
+const copy = en
+  ? { fallback: "Something went wrong while loading this content.", title: "Oops! Something went wrong", details: "Technical details", retry: "Try again", home: "Back to home" }
+  : { fallback: "Une erreur s'est produite lors du chargement de ce contenu.", title: "Oops ! Quelque chose s'est mal passé", details: "Détails techniques", retry: "Réessayer", home: "Retour à l'accueil" };
 
 const {
   error,
-  fallback = "Une erreur s'est produite lors du chargement de ce contenu.",
+  fallback = copy.fallback,
   showDetails = !import.meta.env.PROD,
   onRetry
 } = Astro.props;
-
-const isDev = !import.meta.env.PROD;
 ---
 
 <div class="error-boundary">
@@ -30,13 +36,13 @@ const isDev = !import.meta.env.PROD;
     </div>
 
     <!-- Main Error Message -->
-    <h3 class="error-title">Oops ! Quelque chose s'est mal passé</h3>
+    <h3 class="error-title">{copy.title}</h3>
     <p class="error-message">{fallback}</p>
 
     <!-- Error Details (Development Only) -->
     {showDetails && error && (
       <details class="error-details">
-        <summary class="error-details-summary">Détails techniques</summary>
+        <summary class="error-details-summary">{copy.details}</summary>
         <div class="error-details-content">
           <p><strong>Message:</strong> {error.message}</p>
           {error.code && <p><strong>Code:</strong> {error.code}</p>}
@@ -60,16 +66,16 @@ const isDev = !import.meta.env.PROD;
             <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M3 21v-5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          Réessayer
+          {copy.retry}
         </button>
       )}
 
-      <a href="/" class="home-button">
+      <a href={homePath(lang)} class="home-button">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        Retour à l'accueil
+        {copy.home}
       </a>
     </div>
   </div>

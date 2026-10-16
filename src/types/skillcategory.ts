@@ -11,6 +11,12 @@ export const skillCategory = {
       validation: (Rule: any) => Rule.required(),
     },
     {
+      name: "nameEn",
+      title: "Nom de la catégorie (English)",
+      type: "string",
+      description: "Optionnel — le nom en français est utilisé si vide",
+    },
+    {
       name: "slug",
       title: "Slug",
       type: "slug",
@@ -23,6 +29,12 @@ export const skillCategory = {
     {
       name: "description",
       title: "Description",
+      type: "text",
+      rows: 2,
+    },
+    {
+      name: "descriptionEn",
+      title: "Description (English)",
       type: "text",
       rows: 2,
     },

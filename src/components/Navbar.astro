@@ -1,17 +1,21 @@
 ---
 import { Button } from "@/components/ui/button";
-import { Image } from "astro:assets";
-import profilePic from "../assets/profile.webp";
 // Import the PDF file
 import cvPDF from "/pdf/CV_WILLIAM_MESITI_2025.pdf";
 import Profile from "./Profile.astro";
+import LanguageToggle from "./LanguageToggle.astro";
+import { alternatePath, blogPath, sectionPath, t, type SiteLanguage } from "@/lib/i18n";
 
-const { lang = "fr-CA" } = Astro.props;
-const isEnglish = lang === "en";
-const labels = isEnglish
-    ? { about: "About", skills: "Skills", projects: "Projects", experience: "Experience", resume: "My résumé" }
-    : { about: "À propos", skills: "Compétences", projects: "Projets", experience: "Expérience", resume: "Mon CV" };
-const blogHref = isEnglish ? "/en/blog" : "/fr/blog";
+interface Props {
+    lang?: SiteLanguage;
+    alternateHref?: string;
+}
+
+const { lang = "fr-CA", alternateHref } = Astro.props;
+const copy = t(lang);
+const labels = copy.nav;
+const blogHref = blogPath(lang);
+const toggleHref = alternateHref || alternatePath(Astro.url.pathname, lang);
 ---
 
 <div
@@ -19,27 +23,28 @@ const blogHref = isEnglish ? "/en/blog" : "/fr/blog";
 >
     <Profile />
 
+    <div class="flex flex-row items-center gap-2 lg:gap-4">
     <!-- Desktop Navigation -->
     <div class="hidden lg:flex gap-4 flex-row">
-        <a href="/#about">
+        <a href={sectionPath(lang, "about")}>
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                 >{labels.about}</Button
             >
         </a>
-        <a href="/#skills">
+        <a href={sectionPath(lang, "skills")}>
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                 >{labels.skills}</Button
             >
         </a>
-        <a href="/#projects">
+        <a href={sectionPath(lang, "projects")}>
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                 >{labels.projects}</Button
             >
         </a>
-        <a href="/#experience">
+        <a href={sectionPath(lang, "experience")}>
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                 >{labels.experience}</Button
@@ -64,11 +69,13 @@ const blogHref = isEnglish ? "/en/blog" : "/fr/blog";
         </a>
     </div>
 
+    <LanguageToggle lang={lang} href={toggleHref} label={labels.switchLanguage} />
+
     <!-- Mobile Hamburger Menu -->
     <button
         id="mobile-menu-button"
         class="lg:hidden flex flex-col gap-1 p-2 z-50 relative"
-        aria-label={isEnglish ? "Open navigation menu" : "Ouvrir le menu de navigation"}
+        aria-label={labels.openMenu}
         aria-controls="mobile-menu"
         aria-expanded="false"
     >
@@ -85,6 +92,7 @@ const blogHref = isEnglish ? "/en/blog" : "/fr/blog";
         >
         </div>
     </button>
+    </div>
 
     <!-- Mobile Dropdown Menu -->
     <div
@@ -92,25 +100,25 @@ const blogHref = isEnglish ? "/en/blog" : "/fr/blog";
         class="absolute top-full left-0 right-0 bg-mochablack border-b border-mochaborder opacity-0 invisible transform translate-y-2 transition-all duration-300 z-40 lg:hidden"
     >
         <div class="flex flex-col p-4 gap-3">
-            <a href="/#about" class="mobile-nav-link">
+            <a href={sectionPath(lang, "about")} class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                     >{labels.about}</Button
                 >
             </a>
-            <a href="/#skills" class="mobile-nav-link">
+            <a href={sectionPath(lang, "skills")} class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                     >{labels.skills}</Button
                 >
             </a>
-            <a href="/#experience" class="mobile-nav-link">
+            <a href={sectionPath(lang, "experience")} class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                     >{labels.experience}</Button
                 >
             </a>
-            <a href="/#projects" class="mobile-nav-link">
+            <a href={sectionPath(lang, "projects")} class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                     >{labels.projects}</Button

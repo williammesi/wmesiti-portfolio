@@ -1,182 +1,45 @@
 ---
-import { Image } from "astro:assets";
-import { createClient } from "@sanity/client";
-import { Button } from '@/components/ui/button'
-import { Icon } from 'astro-icon/components'
-import SkillsTabs from "./SkillsTabs.astro";
-import { PortableText } from "astro-portabletext";
+import TimelineColumn from "./TimelineColumn.astro";
+import { queries, sanityFetch } from "@/lib/sanity";
+import { safeAsync } from "@/utils/errorHandling";
+import { queryLang, t, type SiteLanguage } from "@/lib/i18n";
+import type { TimelineEntry } from "@/types/sanity";
 
-const { id } = Astro.props;
-
-// Initialize Sanity client
-const client = createClient({
-  projectId: "9bdbnjzy",
-  dataset: "production",
-  useCdn: false,
-  apiVersion: "2023-01-01",
-});
-
-// Fetch experiences from Sanity
-interface Experience {
-  _id: string;
-  company: string;
-  position: string;
-  logoUrl?: string;
-  startDate: string;
-  endDate?: string;
-  current: boolean;
-  description?: any;
-  skills?: string[];
+interface Props {
+  id?: string;
+  lang?: SiteLanguage;
 }
 
-const experiences: Experience[] = await client.fetch(`
-  *[_type == "experience"] | order(coalesce(order, 999) asc, startDate desc) {
-    _id,
-    company,
-    position,
-    "logoUrl": logo.asset->url,
-    startDate,
-    endDate,
-    current,
-    description,
-    skills
-  }
-`);
+const { id, lang = "fr-CA" } = Astro.props;
+const copy = t(lang).experience;
+const params = { lang: queryLang(lang) };
 
-// Format date function
-function formatDate(dateString: string): string {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("fr-FR", {
-    year: "numeric",
-    month: "long"
-  });
-}
-
-// Calculate duration
-function calculateDuration(startDate: string, endDate?: string): string {
-  const start = new Date(startDate);
-  const end = endDate ? new Date(endDate) : new Date();
-
-  const diffInMonths = (end.getFullYear() - start.getFullYear()) * 12 +
-                      (end.getMonth() - start.getMonth());
-
-  if (diffInMonths < 12) {
-    return `${diffInMonths} mois`;
-  } else {
-    const years = Math.floor(diffInMonths / 12);
-    const months = diffInMonths % 12;
-    if (months === 0) {
-      return `${years} an${years > 1 ? 's' : ''}`;
-    }
-    return `${years} an${years > 1 ? 's' : ''} ${months} mois`;
-  }
-}
+const [experiences, educations] = await Promise.all([
+  safeAsync(() => sanityFetch<TimelineEntry[]>(queries.experiences, params), []),
+  safeAsync(() => sanityFetch<TimelineEntry[]>(queries.educations, params), []),
+]);
 ---
 
-<div id={id} class="flex flex-col items-center  md:p-8 gap-6">
-   <!-- Header Section -->
-   <div class="text-center">
-      <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2">Expériences</h2>
+<section id={id} class="flex flex-col items-center md:p-8 gap-10">
+   <header class="text-center">
+      <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2">{copy.title}</h2>
       <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
+   </header>
+
+   <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 px-2">
+      <TimelineColumn
+         lang={lang}
+         title={copy.work}
+         icon="mdi:briefcase-outline"
+         entries={experiences}
+         emptyLabel={copy.emptyWork}
+      />
+      <TimelineColumn
+         lang={lang}
+         title={copy.education}
+         icon="mdi:school-outline"
+         entries={educations}
+         emptyLabel={copy.emptyEducation}
+      />
    </div>
-
-   <!-- Education Note -->
-   <div class="w-full max-w-4xl">
-      <div class="bg-mochasurface border border-mochaborder rounded-xl p-6 text-center">
-         <Icon name="mdi:school" class="w-8 h-8 text-indigo-400 mx-auto mb-3" />
-         <h3 class="text-lg font-semibold text-mochawhite mb-2">Formation</h3>
-         <p class="text-mochawhite/70">DEC technique en informatique - En cours</p>
-      </div>
-   </div>
-
-   <!-- Work Experience Timeline -->
-   <div class="w-full max-w-4xl">
-      <div class="relative">
-         <!-- Timeline Line -->
-         <div class="hidden md:block absolute left-6 top-0 bottom-0 w-0.5 bg-mochaborder"></div>
-         
-         <!-- Experience Items -->
-         <div class="space-y-6">
-            {experiences.map((experience, index) => (
-               <div class="relative pl-0 md:pl-16 group">
-                  <!-- Timeline Dot -->
-                  <div class={`hidden md:block absolute left-5 top-4 w-3 h-3 rounded-full border-2 border-mochasurface ${
-                     experience.current
-                        ? 'bg-indigo-400'
-                        : 'bg-mochawhite/60'
-                  }`}></div>
-
-                  <!-- Experience Card -->
-                  <div class={`bg-mochasurface border border-mochaborder rounded-xl p-6 transition-colors duration-200 ${
-                     experience.current
-                        ? 'hover:border-indigo-400/50'
-                        : 'hover:border-mochawhite/30'
-                  }`}>
-                     <div class="flex flex-col lg:flex-row gap-6 items-start">
-                        <!-- Company Logo -->
-                        {experience.logoUrl && (
-                           <div class="flex-shrink-0 rounded-2xl">
-                              <img
-                                 class="rounded-xl w-[100px] h-[100px] object-cover"
-                                 src={experience.logoUrl}
-                                 alt={`${experience.company} Logo`}
-                              />
-                           </div>
-                        )}
-
-                        <!-- Content -->
-                        <div class="flex-1">
-                           <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
-                              <div>
-                                 <h3 class={`text-xl font-semibold mb-1 ${
-                                    experience.current
-                                       ? 'text-indigo-300'
-                                       : 'text-mochawhite'
-                                 }`}>
-                                    {experience.position}
-                                 </h3>
-                                 <p class="text-mochawhite font-medium">{experience.company}</p>
-                              </div>
-                              <div class="flex flex-col lg:items-end mt-2 lg:mt-0">
-                                 <span class="text-sm text-mochawhite/70">
-                                    {formatDate(experience.startDate)} - {experience.current ? 'Aujourd\'hui' : formatDate(experience.endDate ?? "")}
-                                 </span>
-                                 {experience.current ? (
-                                    <span class="text-xs text-green-400 mt-1">En cours</span>
-                                 ) : (
-                                    <span class="text-xs text-mochawhite/50 mt-1">
-                                       {calculateDuration(experience.startDate, experience.endDate)}
-                                    </span>
-                                 )}
-                              </div>
-                           </div>
-
-                           <!-- Skills -->
-                           {experience.skills && experience.skills.length > 0 && (
-                              <div class="flex flex-wrap gap-2 mb-4">
-                                 {experience.skills.map((skill) => (
-                                    <span class="px-3 py-1 bg-mochasurface border border-mochaborder rounded-md text-mochawhite text-sm">
-                                       {skill}
-                                    </span>
-                                 ))}
-                              </div>
-                           )}
-
-                           <!-- Description -->
-                           {experience.description && (
-                              <div class="text-mochawhite/90">
-                                 <PortableText value={experience.description} />
-                              </div>
-                           )}
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            ))}
-         </div>
-      </div>
-   </div>
-
-   
-</div>
+</section>

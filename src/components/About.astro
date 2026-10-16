@@ -1,55 +1,72 @@
 ---
-import { Image } from "astro:assets";
-import profilePic from "../assets/profile.webp";
-import { Button } from '@/components/ui/button'
 import { Icon } from 'astro-icon/components'
+import { PortableText } from 'astro-portabletext';
+import { queries, sanityFetch } from '@/lib/sanity';
+import { safeAsync } from '@/utils/errorHandling';
+import { queryLang, t, type SiteLanguage } from '@/lib/i18n';
+import type { PortableTextBlock } from '@/types/sanity';
 
-const { id } = Astro.props;
+interface Props {
+   id?: string;
+   lang?: SiteLanguage;
+}
+
+type AboutContent = Partial<Record<"presentation" | "hobbies" | "goals", PortableTextBlock[] | null>>;
+
+const { id, lang = "fr-CA" } = Astro.props;
+const copy = t(lang).about;
+
+const content = await safeAsync(
+   () => sanityFetch<AboutContent | null>(queries.aboutContent, { lang: queryLang(lang) }),
+   null,
+);
+
+// Sanity content wins; the built-in copy is shown until a tab is filled in
+const panels = [
+   { key: "presentation", id: "presentation", fallback: copy.presentation },
+   { key: "hobbies", id: "passtemps", fallback: copy.hobbies },
+   { key: "goals", id: "objectifs", fallback: copy.goals },
+] as const;
 ---
 
 <div id={id} class="grid grid-cols-1 2xl:grid-cols-3 gap-4">
    <div class="col-span-2 order-2 2xl:order-none p-4 md:p-8 rounded-4xl 2xl:rounded-r-none bg-transparent 2xl:bg-mochasurface border-0 2xl:border-1 2xl:border-mochaborder"> 
          <div class="text-md md:text-xl lg:text-4xl font-bold mb-4 bg-mochasurface 2xl:bg-mochablack text-indigo-300 font-mono p-4 rounded border border-mochaborder">
-            &lt;h1&gt;<span class=" text-mochawhite" id="typewriter"></span>&lt;/h1&gt;
+            &lt;h1&gt;<span class=" text-mochawhite" id="typewriter" data-text={copy.greeting}></span>&lt;/h1&gt;
          </div>
 
          <!-- Tabs Navigation -->
          <div class="flex flex-row gap-0  border-b border-mochaborder">
             <button class="text-sm md:text-lg about-tab-button active px-2 md:px-4 py-2 text-indigo-300 border-b-2 border-indigo-300 hover:text-indigo-400 hover:border-indigo-400 transition-colors bg-transparent" data-tab="presentation">
-               Présentation
+               {copy.tabs.presentation}
             </button>
             <button class="text-sm md:text-lg about-tab-button px-2 py-2 md:px-4 text-mochawhite border-b-2 border-transparent hover:text-indigo-300 hover:border-indigo-300 transition-colors bg-transparent" data-tab="passtemps">
-               Passe temps
+               {copy.tabs.hobbies}
             </button>
             <button class="text-sm md:text-lg about-tab-button px-2 py-2 md:px-4 text-mochawhite border-b-2 border-transparent hover:text-indigo-300 hover:border-indigo-300 transition-colors bg-transparent" data-tab="objectifs">
-               Objectifs
+               {copy.tabs.goals}
             </button>
          </div>
 
          <!-- Tabs Content -->
          <div class="about-tab-content bg-mochasurface 2xl:bg-mochablack p-4 rounded-b-xl border  border-mochaborder  border-t-0 mb-4">
-            <div class="about-tab-panel active" data-panel="presentation">
-               <p class="mb-4 text-sm md:text-lg">Je suis un étudiant de dernière année en DEC technique en informatique passionné par le développement de toutes sortes, mais particulièrement par le développement web fullstack.</p>
-            </div>
-            <div class="about-tab-panel hidden" data-panel="passtemps">
-               <p class="mb-4 text-sm md:text-lg">En dehors de l'école, je passe la majorité de mon temps à apprendre de nouvelles technologies et à travailler sur des projets personnels tous aussi originaux les uns que les autres.</p>
-               <p class="mb-4 text-sm md:text-lg">Sinon, je m'intéresse à la musique (Rock, Metal, Rap) et au plein air (Pêche, Randonnée, Camping)!</p>
-            </div>
-            <div class="about-tab-panel hidden" data-panel="objectifs">
-               <p class="mb-4 text-sm md:text-lg">Je suis actuellement à la recherche d'un stage collégial dans le domaine qui me passionne, afin de mettre en pratique mes compétences et d'apprendre auprès des meilleurs de mon domaine.</p>
-               <p class="mb-4 text-sm md:text-lg">Je suis ouvert à toutes les opportunités qui me permettront de grandir professionnellement.</p>
-            </div>
+            {panels.map((panel, index) => {
+               const blocks = content?.[panel.key];
+               return (
+                  <div class:list={["about-tab-panel about-rich text-sm md:text-lg", index === 0 ? "active" : "hidden"]} data-panel={panel.id}>
+                     {blocks && blocks.length > 0
+                        ? <PortableText value={blocks} />
+                        : panel.fallback.map((paragraph) => <p>{paragraph}</p>)}
+                  </div>
+               );
+            })}
          </div>
 
-         <p class="mb-4 text-md md:text-lg font-semibold">Si j'ai su attirer votre attention, n'hésitez pas à me contacter !</p>
-         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <p class="mb-4 text-md md:text-lg font-semibold">{copy.contact}</p>
+         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a href="mailto:wmesiti.tech@gmail.com" target="_blank" rel="noopener noreferrer"  class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-sm md:text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
                 <Icon name="mdi:email" width="20px" height="20px"  style="color: #cdd6f4" />
                 wmesiti.tech@gmail.com
-            </a>
-            <a href="tel:(579) 730-1506" target="_blank" rel="noopener noreferrer" class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-sm md:text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
-                <Icon name="mdi:phone" width="20px" height="20px"  style="color: #cdd6f4" />
-                (579) 730-1506
             </a>
             <a href="https://www.linkedin.com/in/william-mesiti-44960b28b/" target="_blank" rel="noopener noreferrer"  class="flex flex-row items-center gap-4 py-2 px-4 rounded-lg text-sm md:text-lg bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer">
                 <Icon name="mdi:linkedin" width="20px" height="20px"  style="color: #cdd6f4" />
@@ -63,20 +80,53 @@ const { id } = Astro.props;
 
    </div>
    <div class="order-1 2xl:order-none p-4 rounded-tr-4xl rounded-br-4xl bg-mochasurface border border-mochaborder hidden 2xl:block" >
-       <img class="rounded-tr-4xl rounded-br-4xl" src="/profile.webp" alt="Profile Picture"  />
+       <img class="w-full h-full object-cover rounded-tr-4xl rounded-br-4xl" src="/profile.webp" alt={copy.profileAlt}  />
    </div>
 
 </div>
 
+<style>
+   .about-rich :global(p),
+   .about-rich :global(ul),
+   .about-rich :global(ol) {
+      margin-bottom: 1rem;
+   }
+
+   .about-rich :global(ul),
+   .about-rich :global(ol) {
+      padding-left: 1.25rem;
+   }
+
+   .about-rich :global(ul) {
+      list-style: disc;
+   }
+
+   .about-rich :global(ol) {
+      list-style: decimal;
+   }
+
+   .about-rich :global(li) {
+      margin-top: 0.25rem;
+   }
+
+   .about-rich :global(li::marker) {
+      color: rgb(165 180 252);
+   }
+
+   .about-rich :global(strong) {
+      color: rgb(165 180 252);
+   }
+</style>
+
 <script>
    // Typewriter effect
-   const text = "Enchanté, moi c'est William !";
    const typewriterElement = document.getElementById("typewriter");
+   const text = typewriterElement?.dataset.text ?? "";
    let i = 0;
 
    function typeWriter() {
       if (i < text.length && typewriterElement) {
-         typewriterElement.innerHTML += text.charAt(i);
+         typewriterElement.textContent += text.charAt(i);
          i++;
          setTimeout(typeWriter, 100);
       }

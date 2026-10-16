@@ -3,13 +3,20 @@ import ProjectCard from './ProjectCard.astro';
 import ErrorBoundary from './ErrorBoundary.astro';
 import { sanityFetch, queries } from '@/lib/sanity';
 import { safeAsync, fallbackData } from '@/utils/errorHandling';
+import { queryLang, t, type SiteLanguage } from '@/lib/i18n';
 import type { Project } from '@/types/sanity';
 
-const { id } = Astro.props;
+interface Props {
+    id?: string;
+    lang?: SiteLanguage;
+}
+
+const { id, lang = "fr-CA" } = Astro.props;
+const copy = t(lang).projects;
 
 // Fetch projects with error handling and fallback
 const projects: Project[] = await safeAsync(
-  () => sanityFetch<Project[]>(queries.projects),
+  () => sanityFetch<Project[]>(queries.projects, { lang: queryLang(lang) }),
   fallbackData.projects
 );
 
@@ -18,7 +25,7 @@ console.debug(`[Projects] Loaded ${projects.length} projects`);
 ---
 <section id={id} class="projects-section">
     <header class="section-header">
-        <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2 text-center">Projets</h2>
+        <h2 class="text-xl md:text-2xl font-bold text-mochawhite mb-2 text-center">{copy.title}</h2>
         <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
     </header>
 
@@ -26,14 +33,15 @@ console.debug(`[Projects] Loaded ${projects.length} projects`);
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-4" role="list">
             {projects.map((project) => (
                 <div role="listitem">
-                    <ProjectCard project={project} />
+                    <ProjectCard project={project} lang={lang} />
                 </div>
             ))}
         </div>
     ) : (
         <ErrorBoundary
-            fallback="Aucun projet disponible pour le moment."
+            fallback={copy.empty}
             showDetails={false}
+            lang={lang}
         />
     )}
 </section>

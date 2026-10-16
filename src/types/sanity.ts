@@ -130,17 +130,19 @@ export interface Skill extends SanityDocument {
   order?: number;
 }
 
-export interface Experience extends SanityDocument {
-  company: string;
-  position: string;
+/** Experience or education entry, as projected by the timeline queries. */
+export interface TimelineEntry {
+  _id: string;
+  /** Company or institution. */
+  organization: string;
+  /** Localized position or program. */
+  title: string;
+  logoUrl?: string;
   startDate: string;
   endDate?: string;
-  current: boolean;
-  description: string;
-  technologies: string[];
-  achievements?: string[];
-  location?: string;
-  order?: number;
+  current?: boolean;
+  description?: PortableTextBlock[];
+  skills?: string[];
 }
 
 // Content blocks (for rich text content)

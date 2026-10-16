@@ -1,0 +1,57 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import ProjectDetail from '@/components/ProjectDetail.astro';
+import { sanityFetch, queries } from '@/lib/sanity';
+import { safeAsync } from '@/utils/errorHandling';
+import { absoluteUrl } from '@/lib/blog';
+import { isEnglish, projectPath, queryLang, sectionPath, t, type SiteLanguage } from '@/lib/i18n';
+import type { Project } from '@/types/sanity';
+
+interface Props {
+  slug: string;
+  lang: SiteLanguage;
+}
+
+const { slug, lang } = Astro.props;
+const copy = t(lang).projects;
+const otherLang: SiteLanguage = isEnglish(lang) ? "fr-CA" : "en";
+
+// Fetch project data for SEO
+const project = await safeAsync(
+  () => sanityFetch<Project>(queries.projectBySlug, { slug, lang: queryLang(lang) }),
+  null
+);
+
+const seoData = project ? {
+  title: `${project.title} - William's Portfolio`,
+  description: project.summary || project.description?.substring(0, 160),
+  type: "article" as const,
+} : {};
+---
+
+<Layout
+  {...seoData}
+  lang={lang}
+  canonical={absoluteUrl(projectPath(lang, slug))}
+  alternates={[
+    { lang: "fr-CA", href: absoluteUrl(projectPath("fr-CA", slug)) },
+    { lang: "en", href: absoluteUrl(projectPath("en", slug)) },
+    { lang: "x-default", href: absoluteUrl(projectPath("fr-CA", slug)) },
+  ]}
+  alternateHref={projectPath(otherLang, slug)}
+>
+  <div class="w-full lg:w-9/10 mx-auto">
+    <!-- Back Navigation -->
+    <div class="p-4 mb-4">
+      <a href={sectionPath(lang, "projects")}
+         class="inline-flex items-center gap-2 px-4 py-2 bg-mochasurface hover:bg-mochasurfacelight border border-mochaborder rounded-lg text-mochawhite transition-colors">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {copy.back}
+      </a>
+    </div>
+
+    <ProjectDetail slug={slug} lang={lang} />
+  </div>
+</Layout>

@@ -21,16 +21,13 @@
 .blog-sticky-header { position: relative; z-index: 20; flex: 0 0 auto; border-bottom: 1px solid #313244; background: #181825; }
 .blog-scroll-view { flex: 1 1 auto; min-height: 0; padding: 1rem .6rem 2rem .1rem; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .blog-scroll-view:focus-visible { outline-offset: -2px; }
-.blog-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.5rem; align-items: center; margin-bottom: 0; }
+.blog-hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; align-items: center; margin-bottom: 0; }
 .blog-hero > div:first-child { max-width: 820px; }
 .eyebrow, .category-kicker { color: #89b4fa; font-size: .76rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
 .blog-hero h1, .taxonomy-page h1 { color: #f5e0dc; font-weight: 750; letter-spacing: -.045em; line-height: 1; margin: .3rem 0 .65rem; }
 .blog-hero h1 { font-size: clamp(2rem, 4.5vw, 3.75rem); }
 .blog-hero > div > p:last-child, .taxonomy-page header > p:last-child { color: rgba(205, 214, 244, .72); max-width: 760px; }
 .blog-hero > div > p:last-child { font-size: clamp(.9rem, 1.5vw, 1.05rem); line-height: 1.55; }
-.language-switcher { display: flex; gap: .35rem; padding: .25rem; border: 1px solid #313244; border-radius: 999px; background: #1e1e2e; }
-.language-switcher a, .language-switcher span { min-width: 2.5rem; padding: .45rem .7rem; border-radius: 999px; color: rgba(205, 214, 244, .7); font-size: .75rem; font-weight: 700; text-align: center; }
-.language-switcher [aria-current="page"], .language-switcher a:hover { background: #cdd6f4; color: #181825; }
 
 .blog-search { position: relative; margin: .8rem 0 .7rem; --pagefind-ui-scale: .85; --pagefind-ui-primary: #89b4fa; --pagefind-ui-text: #cdd6f4; --pagefind-ui-background: #1e1e2e; --pagefind-ui-border: #313244; --pagefind-ui-tag: #313244; --pagefind-ui-border-width: 1px; --pagefind-ui-border-radius: 12px; --pagefind-ui-font: Montserrat, system-ui, sans-serif; }
 .blog-search .pagefind-ui__search-input { font-weight: 500; }
@@ -112,10 +109,8 @@
   .table-of-contents { position: static; order: 0; padding: 1rem; border: 1px solid #313244; border-radius: .75rem; }
 }
 @media (max-width: 560px) {
-  .blog-index .blog-hero { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
   .blog-index .blog-hero h1 { font-size: clamp(1.85rem, 10vw, 2.5rem); }
   .blog-index .blog-hero > div > p:last-child { font-size: .86rem; line-height: 1.45; }
-  .blog-index .language-switcher a { min-width: 2.15rem; padding: .35rem .5rem; }
   .blog-index .blog-search { margin-top: .6rem; }
   .blog-scroll-view { padding-top: .75rem; }
   .article-header h1 { font-size: clamp(2.35rem, 13vw, 4rem); }

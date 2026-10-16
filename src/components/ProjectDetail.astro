@@ -6,17 +6,20 @@ import { safeAsync, fallbackData } from '@/utils/errorHandling';
 import { getImageUrl } from '@/lib/imageUtils';
 import type { Project } from '@/types/sanity';
 import { PROJECT_STATUS } from '@/types/sanity';
+import { queryLang, t, type SiteLanguage } from '@/lib/i18n';
 
 // Accept project slug as props
 interface Props {
   slug: string;
+  lang?: SiteLanguage;
 }
 
-const { slug } = Astro.props;
+const { slug, lang = "fr-CA" } = Astro.props;
+const copy = t(lang).projects;
 
 // Fetch project with error handling
 const project: Project | null = await safeAsync(
-  () => sanityFetch<Project>(queries.projectBySlug, { slug }),
+  () => sanityFetch<Project>(queries.projectBySlug, { slug, lang: queryLang(lang) }),
   null
 );
 
@@ -59,7 +62,7 @@ const statusConfig = PROJECT_STATUS[project.status];
           <h1 class="text-xl md:text-4xl font-bold text-mochawhite">{project.title}</h1>
           <div class="flex flex-row items-center gap-4">
             <span class={`px-3 py-1 rounded-md text-sm border ${statusConfig.className}`}>
-            {statusConfig.label}
+            {copy.status[project.status]}
             </span>
             <span class="text-sm text-mochawhite/50">{project.year}</span>
           </div>
@@ -89,14 +92,14 @@ const statusConfig = PROJECT_STATUS[project.status];
           <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
              class="flex items-center gap-2 px-4 py-2 bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder rounded-lg text-mochawhite transition-colors">
             <Icon name="mdi:github" width="20" height="20" />
-            Code source
+            {copy.source}
           </a>
         )}
         {project.liveUrl && (
           <a href={project.liveUrl} target="_blank" rel="noopener noreferrer"
              class="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 border border-indigo-500 rounded-lg text-white transition-colors">
             <Icon name="mdi:open-in-new" width="20" height="20" />
-            Voir le projet
+            {copy.live}
           </a>
         )}
       </div>
@@ -129,12 +132,12 @@ const statusConfig = PROJECT_STATUS[project.status];
           <>
             <button class="carousel-prev absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-mochasurface/90 hover:bg-mochasurface border border-mochaborder rounded-full p-2 md:p-3 text-mochawhite transition-all duration-200 backdrop-blur-sm shadow-lg z-10"
                     id="carousel-prev"
-                    aria-label="Image précédente">
+                    aria-label={copy.previous}>
               <Icon name="mdi:chevron-left" class="w-4 h-4 md:w-6 md:h-6" />
             </button>
             <button class="carousel-next absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-mochasurface/90 hover:bg-mochasurface border border-mochaborder rounded-full p-2 md:p-3 text-mochawhite transition-all duration-200 backdrop-blur-sm shadow-lg z-10"
                     id="carousel-next"
-                    aria-label="Image suivante">
+                    aria-label={copy.next}>
               <Icon name="mdi:chevron-right" class="w-4 h-4 md:w-6 md:h-6" />
             </button>
           </>
@@ -148,7 +151,7 @@ const statusConfig = PROJECT_STATUS[project.status];
                 index === 0 ? 'bg-indigo-400 scale-110' : 'bg-mochasurface hover:bg-mochasurfacelight hover:scale-105'
               }`}
               data-slide={index}
-              aria-label={`Aller à l'image ${index + 1}`}>
+              aria-label={`${copy.goTo} ${index + 1}`}>
               </button>
             ))}
           </div>
@@ -169,7 +172,7 @@ const statusConfig = PROJECT_STATUS[project.status];
   {project.features && project.features.length > 0 && (
     <div class="my-8">
       <div class="mb-6 flex flex-col gap-2">
-        <h2 class="text-xl md:text-2xl font-bold text-mochawhite text-center">Fonctionnalités principales</h2>
+        <h2 class="text-xl md:text-2xl font-bold text-mochawhite text-center">{copy.features}</h2>
         <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
       </div>
       
@@ -195,7 +198,7 @@ const statusConfig = PROJECT_STATUS[project.status];
   {project.challenges && project.challenges.length > 0 && (
     <div class="my-8" >
       <div class="mb-6 flex flex-col gap-2">
-        <h2 class="text-xl md:text-2xl font-bold text-mochawhite text-center">Défis & Solutions</h2>
+        <h2 class="text-xl md:text-2xl font-bold text-mochawhite text-center">{copy.challenges}</h2>
         <div class="w-16 h-0.5 bg-indigo-400 mx-auto"></div>
       </div>
 
@@ -206,7 +209,7 @@ const statusConfig = PROJECT_STATUS[project.status];
             <div class="bg-red-500/10 border w-full border-red-500/30 rounded-2xl p-6">
               <div class="flex items-center gap-2 mb-3">
                 <Icon name="mdi:alert-circle" width="20" height="20" class="text-red-400" />
-                <h3 class="text-lg font-semibold text-red-300">Défi</h3>
+                <h3 class="text-lg font-semibold text-red-300">{copy.challenge}</h3>
               </div>
               <h4 class="font-medium text-mochawhite mb-2">{challenge.challengeName}</h4>
               <p class="text-mochawhite/70 text-sm">{challenge.challengeDescription}</p>
@@ -222,7 +225,7 @@ const statusConfig = PROJECT_STATUS[project.status];
             <div class="bg-green-500/10 w-full border  border-green-500/30 rounded-2xl p-6">
               <div class="flex items-center gap-2 mb-3">
                 <Icon name="mdi:check-circle" width="20" height="20" class="text-green-400" />
-                <h3 class="text-lg font-semibold text-green-300">Solution</h3>
+                <h3 class="text-lg font-semibold text-green-300">{copy.solution}</h3>
               </div>
               <h4 class="font-medium text-mochawhite mb-2">{challenge.solutionName}</h4>
               <p class="text-mochawhite/70 text-sm">{challenge.solutionDescription}</p>

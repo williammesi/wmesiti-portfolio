@@ -2,11 +2,14 @@
 import Navbar from "../components/Navbar.astro";
 import SEO from "../components/SEO.astro";
 import type { SEOProps } from "@/types/sanity";
+import { t } from "@/lib/i18n";
 import "../styles/global.css";
 
 interface Props extends SEOProps {
   bodyClass?: string;
   pagefindIgnore?: boolean;
+  /** Equivalent page in the other language, used by the navbar language toggle. */
+  alternateHref?: string;
 }
 
 const {
@@ -28,6 +31,7 @@ const {
   breadcrumbs,
   bodyClass = "",
   pagefindIgnore = false,
+  alternateHref,
 } = Astro.props;
 ---
 
@@ -67,9 +71,9 @@ const {
 	</head>
 	<body class={`m-0 w-full h-full font-[montserrat] bg-mochablack text-mochawhite ${bodyClass}`} data-pagefind-ignore={pagefindIgnore ? "" : undefined}>
 		<!-- Skip to main content for accessibility -->
-		<a href="#main-content" class="skip-link">{lang === "en" ? "Skip to main content" : "Aller au contenu principal"}</a>
+		<a href="#main-content" class="skip-link">{t(lang).skipLink}</a>
 
-		<Navbar lang={lang} />
+		<Navbar lang={lang} alternateHref={alternateHref} />
 
 		<main id="main-content" class="main-content">
 			<slot />

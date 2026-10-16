@@ -34,19 +34,15 @@ const copy = locales[locale];
     { lang: "en", href: absoluteUrl("/en/blog") },
     { lang: "x-default", href: absoluteUrl("/fr/blog") },
   ]}
+  alternateHref={locale === "fr" ? "/en/blog" : "/fr/blog"}
 >
   <div class="blog-shell blog-index">
     <div class="blog-sticky-header">
       <header class="blog-hero">
         <div>
-          <p class="eyebrow">William Mesiti · {locale === "fr" ? "Blog personnel · Devlog" : "Personal blog · Devlog"}</p>
           <h1>{copy.title}</h1>
           <p>{copy.intro}</p>
         </div>
-        <nav class="language-switcher" aria-label={locale === "fr" ? "Changer de langue" : "Change language"}>
-          <a href="/fr/blog" aria-current={locale === "fr" ? "page" : undefined}>FR</a>
-          <a href="/en/blog" aria-current={locale === "en" ? "page" : undefined}>EN</a>
-        </nav>
       </header>
 
       <BlogSearch locale={locale} />

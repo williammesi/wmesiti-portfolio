@@ -39,53 +39,102 @@ export async function sanityFetch<T>(
   }
 }
 
-// Project-specific queries
+// Localized field projection: English value when `$lang == "en"` and it is
+// filled in, otherwise the French source field.
+const localized = (field: string, alias = field) =>
+  `"${alias}": select($lang == "en" => coalesce(${field}En, ${field}), ${field})`;
+
+const projectProjection = `
+  _id,
+  title,
+  slug,
+  ${localized("summary")},
+  ${localized("description")},
+  status,
+  year,
+  thumbnail,
+  image1,
+  image2,
+  image3,
+  technologies,
+  "features": features[]{
+    image,
+    ${localized("name")},
+    ${localized("description")}
+  },
+  "challenges": challenges[]{
+    ${localized("challengeName")},
+    ${localized("challengeDescription")},
+    ${localized("solutionName")},
+    ${localized("solutionDescription")}
+  },
+  githubUrl,
+  liveUrl,
+  featured,
+  order
+`;
+
+const timelineProjection = (title: string, organization: string) => `
+  _id,
+  "organization": ${organization},
+  ${localized(title, "title")},
+  "logoUrl": logo.asset->url,
+  startDate,
+  endDate,
+  current,
+  ${localized("description")},
+  skills
+`;
+
+// Every query that uses `localized` expects a `$lang` param ("fr" | "en").
 export const queries = {
   // Get all projects with ordering
   projects: `
     *[_type == "project"] | order(coalesce(order, 999) asc, _createdAt desc) {
-      _id,
-      title,
-      slug,
-      summary,
-      description,
-      status,
-      year,
-      thumbnail,
-      image1,
-      image2,
-      image3,
-      technologies,
-      features,
-      challenges,
-      githubUrl,
-      liveUrl,
-      featured,
-      order
+      ${projectProjection}
     }
   `,
 
   // Get single project by slug
   projectBySlug: `
     *[_type == "project" && slug.current == $slug][0] {
+      ${projectProjection}
+    }
+  `,
+
+  skillCategories: `
+    *[_type == "skillCategory"] | order(coalesce(order, 999) asc) {
       _id,
-      title,
+      ${localized("name")},
       slug,
-      summary,
-      description,
-      status,
-      year,
-      thumbnail,
-      image1,
-      image2,
-      image3,
-      technologies,
-      features,
-      challenges,
-      githubUrl,
-      liveUrl,
-      featured,
+      ${localized("description")},
+      skills[] {
+        name,
+        colorScheme,
+        iconUrl,
+        "icon": icon.asset->url
+      },
       order
+    }
+  `,
+
+  aboutContent: `
+    *[_type == "aboutContent" && _id == "aboutContent"][0] {
+      ${localized("presentation")},
+      ${localized("hobbies")},
+      ${localized("goals")}
+    }
+  `,
+
+  experiences: `
+    *[_type == "experience"] | order(coalesce(order, 999) asc, startDate desc) {
+      ${timelineProjection("position", "company")}
+    }
+  `,
+
+  educations: `
+    *[_type == "education"] | order(coalesce(order, 999) asc, startDate desc) {
+      ${timelineProjection("program", "institution")}
     }
   `,
 
