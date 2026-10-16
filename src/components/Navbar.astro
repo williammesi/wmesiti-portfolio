@@ -5,6 +5,13 @@ import profilePic from "../assets/profile.webp";
 // Import the PDF file
 import cvPDF from "/pdf/CV_WILLIAM_MESITI_2025.pdf";
 import Profile from "./Profile.astro";
+
+const { lang = "fr-CA" } = Astro.props;
+const isEnglish = lang === "en";
+const labels = isEnglish
+    ? { about: "About", skills: "Skills", projects: "Projects", experience: "Experience", resume: "My résumé" }
+    : { about: "À propos", skills: "Compétences", projects: "Projets", experience: "Expérience", resume: "Mon CV" };
+const blogHref = isEnglish ? "/en/blog" : "/fr/blog";
 ---
 
 <div
@@ -17,28 +24,28 @@ import Profile from "./Profile.astro";
         <a href="/#about">
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                >À propos</Button
+                >{labels.about}</Button
             >
         </a>
         <a href="/#skills">
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                >Compétences</Button
+                >{labels.skills}</Button
             >
         </a>
         <a href="/#projects">
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                >Projets</Button
+                >{labels.projects}</Button
             >
         </a>
         <a href="/#experience">
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                >Expérience</Button
+                >{labels.experience}</Button
             >
         </a>
-        <a href="/blog">
+        <a href={blogHref}>
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                 >Blog</Button
@@ -52,7 +59,7 @@ import Profile from "./Profile.astro";
         >
             <Button
                 class="bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                >Mon CV</Button
+                >{labels.resume}</Button
             >
         </a>
     </div>
@@ -61,6 +68,9 @@ import Profile from "./Profile.astro";
     <button
         id="mobile-menu-button"
         class="lg:hidden flex flex-col gap-1 p-2 z-50 relative"
+        aria-label={isEnglish ? "Open navigation menu" : "Ouvrir le menu de navigation"}
+        aria-controls="mobile-menu"
+        aria-expanded="false"
     >
         <div
             class="hamburger-line w-6 h-0.5 bg-mochawhite transition-all duration-300"
@@ -85,28 +95,28 @@ import Profile from "./Profile.astro";
             <a href="/#about" class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                    >À propos</Button
+                    >{labels.about}</Button
                 >
             </a>
             <a href="/#skills" class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                    >Compétences</Button
+                    >{labels.skills}</Button
                 >
             </a>
             <a href="/#experience" class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                    >Expérience</Button
+                    >{labels.experience}</Button
                 >
             </a>
             <a href="/#projects" class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                    >Projets</Button
+                    >{labels.projects}</Button
                 >
             </a>
-            <a href="/blog" class="mobile-nav-link">
+            <a href={blogHref} class="mobile-nav-link">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
                     >Blog</Button
@@ -115,7 +125,7 @@ import Profile from "./Profile.astro";
             <a href={cvPDF} target="_blank" rel="noopener noreferrer">
                 <Button
                     class="w-full bg-mochasurface hover:bg-mochasurfacelight/50 border border-mochaborder text-mochawhite cursor-pointer"
-                    >Mon CV</Button
+                    >{labels.resume}</Button
                 >
             </a>
         </div>
@@ -160,6 +170,7 @@ import Profile from "./Profile.astro";
                 "translate-y-2",
             );
             mobileMenuButton?.classList.remove("mobile-menu-open");
+            mobileMenuButton?.setAttribute("aria-expanded", "false");
         } else {
             // Open menu
             mobileMenu?.classList.remove(
@@ -173,6 +184,7 @@ import Profile from "./Profile.astro";
                 "translate-y-0",
             );
             mobileMenuButton?.classList.add("mobile-menu-open");
+            mobileMenuButton?.setAttribute("aria-expanded", "true");
         }
     }
 
@@ -180,6 +192,7 @@ import Profile from "./Profile.astro";
         mobileMenu?.classList.remove("opacity-100", "visible", "translate-y-0");
         mobileMenu?.classList.add("opacity-0", "invisible", "translate-y-2");
         mobileMenuButton?.classList.remove("mobile-menu-open");
+        mobileMenuButton?.setAttribute("aria-expanded", "false");
     }
 
     // Toggle menu on hamburger button click

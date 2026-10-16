@@ -1,9 +1,7 @@
-# Allow all crawlers
+# https://wmesiti-tech.com/robots.txt
 User-agent: *
 Allow: /
-
-# Disallow admin area
 Disallow: /admin
 
 # Sitemap location
-Sitemap: https://wmesiti-portfolio.vercel.app/sitemap.xml
+Sitemap: https://wmesiti-tech.com/sitemap.xml

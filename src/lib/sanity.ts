@@ -3,7 +3,7 @@ import { createClient } from "@sanity/client";
 // Environment variables with fallbacks
 const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID || "9bdbnjzy";
 const dataset = import.meta.env.PUBLIC_SANITY_DATASET || "production";
-const apiVersion = import.meta.env.PUBLIC_SANITY_API_VERSION || "2023-01-01";
+const apiVersion = import.meta.env.PUBLIC_SANITY_API_VERSION || "2025-09-23";
 
 // Centralized Sanity client configuration
 export const sanityClient = createClient({
@@ -92,173 +92,57 @@ export const queries = {
   // Get all project slugs for static paths
   projectSlugs: `
     *[_type == "project"] {
-      "slug": slug.current
-    }
-  `,
-
-  // ===== Blog Queries =====
-
-  // Get all blog categories (public info only, no password hash)
-  blogCategories: `
-    *[_type == "blogCategory"] | order(coalesce(order, 999) asc, _createdAt desc) {
-      _id,
-      title,
-      slug,
-      description,
-      isProtected,
-      order,
-      "postCount": count(*[_type in ["blogPost", "weeklyLog"] && references(^._id)])
-    }
-  `,
-
-  // Get single category by slug (includes password hash for auth)
-  blogCategoryBySlug: `
-    *[_type == "blogCategory" && slug.current == $slug][0] {
-      _id,
-      title,
-      slug,
-      description,
-      isProtected,
-      passwordHash,
-      order
-    }
-  `,
-
-  // Get single category by slug (public, no password hash)
-  blogCategoryBySlugPublic: `
-    *[_type == "blogCategory" && slug.current == $slug][0] {
-      _id,
-      title,
-      slug,
-      description,
-      isProtected,
-      order
-    }
-  `,
-
-  // Get all blog posts for a category
-  blogPostsByCategory: `
-    *[_type == "blogPost" && category->slug.current == $categorySlug] | order(coalesce(order, 999) asc, publishedAt desc) {
-      _id,
-      title,
-      slug,
-      excerpt,
-      coverImage,
-      publishedAt,
-      featured,
-      order,
-      category->{
-        title,
-        slug,
-        isProtected
-      }
-    }
-  `,
-
-  // Get single blog post by slug
-  blogPostBySlug: `
-    *[_type == "blogPost" && slug.current == $slug && category->slug.current == $categorySlug][0] {
-      _id,
-      title,
-      slug,
-      excerpt,
-      content,
-      coverImage,
-      publishedAt,
-      featured,
-      order,
-      category->{
-        _id,
-        title,
-        slug,
-        isProtected
-      }
-    }
-  `,
-
-  // Get all blog post paths for static generation
-  blogPostPaths: `
-    *[_type == "blogPost"] {
       "slug": slug.current,
-      "categorySlug": category->slug.current
+      _updatedAt
     }
   `,
 
-  // Get all category slugs for static paths
-  blogCategorySlugs: `
-    *[_type == "blogCategory"] {
-      "slug": slug.current
-    }
-  `,
-
-  // ===== Weekly Log Queries =====
-
-  // Get all weekly logs for a category
-  weeklyLogsByCategory: `
-    *[_type == "weeklyLog" && category->slug.current == $categorySlug] | order(weekNumber desc) {
-      _id,
-      title,
-      slug,
-      weekNumber,
-      publishedAt,
-      category->{
-        title,
-        slug,
-        isProtected
+  // ===== Public technical blog queries =====
+  articlesByLanguage: `
+    *[_type == "article" && language == $language && defined(publishedAt) && publishedAt <= now()]
+      | order(featured desc, publishedAt desc) {
+        _id, title, "slug": slug.current, language, excerpt, coverImage,
+        publishedAt, updatedAt, featured,
+        category->{_id, "slug": slug.current, titleFr, titleEn, descriptionFr, descriptionEn},
+        "tags": coalesce(tags[]->{_id, "slug": slug.current, titleFr, titleEn}, [])
       }
+  `,
+
+  articleBySlug: `
+    *[_type == "article" && language == $language && slug.current == $slug && defined(publishedAt) && publishedAt <= now()][0] {
+      _id, title, "slug": slug.current, language, excerpt,
+      "body": body[]{..., markDefs[]{..., reference->{title, "slug": slug.current, language}}},
+      coverImage,
+      publishedAt, updatedAt, author, featured, seoTitle, seoDescription,
+      socialImage, externalCanonicalUrl,
+      category->{_id, "slug": slug.current, titleFr, titleEn, descriptionFr, descriptionEn},
+      "tags": coalesce(tags[]->{_id, "slug": slug.current, titleFr, titleEn}, []),
+      translation->{_id, title, "slug": slug.current, language, publishedAt}
     }
   `,
 
-  // Get single weekly log by slug
-  weeklyLogBySlug: `
-    *[_type == "weeklyLog" && slug.current == $slug && category->slug.current == $categorySlug][0] {
-      _id,
-      title,
-      slug,
-      weekNumber,
-      publishedAt,
-      part1Tasks,
-      part2SupervisorQA,
-      part3TeacherQA,
-      part4Notes,
-      category->{
-        _id,
-        title,
-        slug,
-        isProtected
-      }
-    }
-  `,
-
-  // Get all weekly log paths for static generation
-  weeklyLogPaths: `
-    *[_type == "weeklyLog"] {
+  articlePaths: `
+    *[_type == "article" && defined(publishedAt) && publishedAt <= now()] {
       "slug": slug.current,
-      "categorySlug": category->slug.current
+      language,
+      updatedAt,
+      publishedAt,
+      externalCanonicalUrl,
+      coverImage,
+      "categorySlug": category->slug.current,
+      "tagSlugs": coalesce(tags[]->slug.current, [])
     }
   `,
 
-  // Get all content for a category (both blog posts and weekly logs)
-  allContentByCategory: `
-    {
-      "posts": *[_type == "blogPost" && category->slug.current == $categorySlug] | order(publishedAt desc) {
-        _id,
-        _type,
-        title,
-        slug,
-        excerpt,
-        coverImage,
-        publishedAt,
-        featured
-      },
-      "weeklyLogs": *[_type == "weeklyLog" && category->slug.current == $categorySlug] | order(weekNumber desc) {
-        _id,
-        _type,
-        title,
-        slug,
-        weekNumber,
-        publishedAt
-      }
+  articleCategories: `
+    *[_type == "articleCategory"] | order(titleFr asc) {
+      _id, "slug": slug.current, titleFr, titleEn, descriptionFr, descriptionEn
+    }
+  `,
+
+  articleTags: `
+    *[_type == "articleTag"] | order(titleFr asc) {
+      _id, "slug": slug.current, titleFr, titleEn
     }
   `,
 } as const;

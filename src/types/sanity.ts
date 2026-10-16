@@ -71,63 +71,55 @@ export interface Challenge {
   solutionDescription: string;
 }
 
-// Blog-related interfaces
-export interface BlogCategory extends SanityDocument {
-  title: string;
-  slug: SanitySlug;
-  description?: string;
-  isProtected: boolean;
-  passwordHash?: string;
-  order?: number;
+// Technical blog interfaces. Slugs are projected to strings by blog queries.
+export type BlogLanguage = 'fr-CA' | 'en';
+export type BlogLocale = 'fr' | 'en';
+
+export interface ArticleTaxonomy {
+  _id: string;
+  slug: string;
+  titleFr: string;
+  titleEn: string;
+  descriptionFr?: string;
+  descriptionEn?: string;
 }
 
-export interface BlogPost extends SanityDocument {
+export interface ArticleTranslation {
+  _id: string;
   title: string;
-  slug: SanitySlug;
-  category: BlogCategory;
+  slug: string;
+  language: BlogLanguage;
+  publishedAt: string;
+}
+
+export interface ArticleImage extends SanityImage {
+  alt?: string;
+  caption?: string;
+}
+
+export interface ArticlePreview {
+  _id: string;
+  title: string;
+  slug: string;
+  language: BlogLanguage;
   excerpt: string;
-  coverImage?: SanityImage;
-  content: PortableTextBlock[];
+  coverImage?: ArticleImage;
   publishedAt: string;
+  updatedAt?: string;
   featured: boolean;
-  order?: number;
+  category?: ArticleTaxonomy;
+  tags: ArticleTaxonomy[];
 }
 
-// Blog preview types (without sensitive data)
-export type BlogCategoryPublic = Omit<BlogCategory, 'passwordHash'>;
-export type BlogPostPreview = Pick<BlogPost, '_id' | 'title' | 'slug' | 'excerpt' | 'coverImage' | 'publishedAt' | 'featured'> & {
-  category: Pick<BlogCategory, 'title' | 'slug' | 'isProtected'>;
-};
-
-// Weekly Log interfaces
-export interface TaskItem {
-  _key?: string;
-  taskName: string;
-  completed: boolean;
+export interface Article extends ArticlePreview {
+  body: PortableTextNode[];
+  author: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  socialImage?: ArticleImage;
+  externalCanonicalUrl?: string;
+  translation?: ArticleTranslation;
 }
-
-export interface QAItem {
-  _key?: string;
-  question: string;
-  answer?: string;
-}
-
-export interface WeeklyLog extends SanityDocument {
-  title: string;
-  slug: SanitySlug;
-  category: BlogCategory;
-  weekNumber: number;
-  publishedAt: string;
-  part1Tasks?: TaskItem[];
-  part2SupervisorQA?: QAItem[];
-  part3TeacherQA?: QAItem[];
-  part4Notes?: PortableTextBlock[];
-  order?: number;
-}
-
-export type WeeklyLogPreview = Pick<WeeklyLog, '_id' | 'title' | 'slug' | 'weekNumber' | 'publishedAt'> & {
-  category: Pick<BlogCategory, 'title' | 'slug' | 'isProtected'>;
-};
 
 // Skills and Experience interfaces
 export interface Skill extends SanityDocument {
@@ -168,6 +160,12 @@ export interface PortableTextBlock {
     [key: string]: any;
   }>;
 }
+
+export type PortableTextNode = PortableTextBlock | {
+  _type: string;
+  _key: string;
+  [key: string]: unknown;
+};
 
 // API Response types
 export interface SanityResponse<T> {
@@ -229,6 +227,16 @@ export interface SEOProps {
   url?: string;
   type?: 'website' | 'article';
   noindex?: boolean;
+  lang?: BlogLanguage;
+  canonical?: string;
+  alternates?: Array<{ lang: string; href: string }>;
+  publishedAt?: string;
+  updatedAt?: string;
+  author?: string;
+  imageAlt?: string;
+  keywords?: string[];
+  articleSection?: string;
+  breadcrumbs?: Array<{ name: string; url: string }>;
 }
 
 // Error handling types

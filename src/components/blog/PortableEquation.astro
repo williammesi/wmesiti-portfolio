@@ -1,0 +1,22 @@
+---
+import katex from "katex";
+
+const { node } = Astro.props;
+let rendered = "";
+let invalid = false;
+try {
+  rendered = katex.renderToString(String(node?.latex || ""), {
+    displayMode: node?.display !== false,
+    throwOnError: true,
+    output: "htmlAndMathml",
+  });
+} catch {
+  invalid = true;
+}
+---
+
+{invalid ? (
+  <pre class="equation-error"><code>{node?.latex}</code></pre>
+) : (
+  <div class:list={["equation", { "equation-inline": node?.display === false }]} set:html={rendered} />
+)}

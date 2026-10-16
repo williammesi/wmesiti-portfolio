@@ -1,0 +1,37 @@
+---
+import type { BlogLocale } from "@/types/sanity";
+import { locales } from "@/lib/blog";
+const { locale } = Astro.props as { locale: BlogLocale };
+const copy = locales[locale];
+---
+
+<section class="blog-search" aria-labelledby="search-title">
+  <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+  <h2 id="search-title" class="sr-only">{copy.search}</h2>
+  <div id="pagefind-search" data-locale={locale} data-placeholder={copy.searchPlaceholder}></div>
+  <noscript>{locale === "fr" ? "Activez JavaScript pour utiliser la recherche." : "Enable JavaScript to use search."}</noscript>
+</section>
+
+<script>
+  const container = document.querySelector<HTMLElement>("#pagefind-search");
+  if (container) {
+    const locale = container.dataset.locale || "fr";
+    const script = document.createElement("script");
+    script.src = "/pagefind/pagefind-ui.js";
+    script.onload = () => {
+        const PagefindUI = (window as any).PagefindUI;
+        if (PagefindUI) {
+          new PagefindUI({
+            element: "#pagefind-search",
+            showSubResults: true,
+            translations: { placeholder: container.dataset.placeholder },
+            filters: { language: locale },
+          });
+        }
+    };
+    script.onerror = () => {
+      container.innerHTML = `<p class="search-unavailable">${locale === "fr" ? "La recherche sera disponible après le prochain build." : "Search will be available after the next build."}</p>`;
+    };
+    document.head.appendChild(script);
+  }
+</script>

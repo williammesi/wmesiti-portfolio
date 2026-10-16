@@ -1,0 +1,39 @@
+---
+import { PortableText } from "astro-portabletext";
+import "katex/dist/katex.min.css";
+import type { PortableTextNode } from "@/types/sanity";
+import PortableHeading from "./PortableHeading.astro";
+import PortableImage from "./PortableImage.astro";
+import PortableCode from "./PortableCode.astro";
+import PortableEquation from "./PortableEquation.astro";
+import PortableTable from "./PortableTable.astro";
+import PortableLink from "./PortableLink.astro";
+import PortableInternalLink from "./PortableInternalLink.astro";
+import PortableDivider from "./PortableDivider.astro";
+import PortableInlineEquation from "./PortableInlineEquation.astro";
+
+const { value } = Astro.props as { value: PortableTextNode[] };
+const components = {
+  type: {
+    image: PortableImage,
+    code: PortableCode,
+    equation: PortableEquation,
+    table: PortableTable,
+    divider: PortableDivider,
+  },
+  block: {
+    h2: PortableHeading,
+    h3: PortableHeading,
+    h4: PortableHeading,
+  },
+  mark: {
+    link: PortableLink,
+    internalLink: PortableInternalLink,
+    inlineEquation: PortableInlineEquation,
+  },
+};
+---
+
+<div class="article-body">
+  <PortableText value={value} components={components} />
+</div>

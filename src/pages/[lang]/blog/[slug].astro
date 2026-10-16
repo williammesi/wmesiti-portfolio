@@ -1,0 +1,132 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ArticleBody from "@/components/blog/ArticleBody.astro";
+import ArticleCard from "@/components/blog/ArticleCard.astro";
+import { queries, sanityFetch } from "@/lib/sanity";
+import { safeAsync } from "@/utils/errorHandling";
+import {
+  absoluteUrl, articleHeadings, articleUrl, formatBlogDate, imageUrl,
+  languageFromLocale, locales, localizedTitle, relatedArticles,
+} from "@/lib/blog";
+import type { Article, ArticlePreview, BlogLocale } from "@/types/sanity";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const paths = await safeAsync(
+    () => sanityFetch<Array<{ slug: string; language: "fr-CA" | "en" }>>(queries.articlePaths),
+    [],
+  );
+  return paths.map((article) => ({
+    params: { lang: article.language === "fr-CA" ? "fr" : "en", slug: article.slug },
+  }));
+}
+
+const locale = Astro.params.lang as BlogLocale;
+const language = languageFromLocale(locale);
+if (!language) return Astro.redirect("/404");
+
+const article = await safeAsync(
+  () => sanityFetch<Article | null>(queries.articleBySlug, { language, slug: Astro.params.slug }),
+  null,
+);
+if (!article) return Astro.redirect("/404");
+
+const allArticles = await safeAsync(
+  () => sanityFetch<ArticlePreview[]>(queries.articlesByLanguage, { language }),
+  [],
+);
+const related = relatedArticles(article, allArticles);
+const copy = locales[locale];
+const headings = articleHeadings(article.body);
+const canonical = article.externalCanonicalUrl || absoluteUrl(articleUrl(article));
+const translationLocale = article.translation?.language === "fr-CA" ? "fr" : "en";
+const languageAlternates = [
+  { lang: article.language, href: absoluteUrl(articleUrl(article)) },
+  ...(article.translation ? [{ lang: article.translation.language, href: absoluteUrl(`/${translationLocale}/blog/${article.translation.slug}`) }] : []),
+];
+const frenchAlternate = languageAlternates.find((alternate) => alternate.lang === "fr-CA")?.href || absoluteUrl(articleUrl(article));
+const alternates = [...languageAlternates, { lang: "x-default", href: frenchAlternate }];
+const shareImage = imageUrl(article.socialImage?.asset?._ref || article.coverImage?.asset?._ref, 1200);
+const categoryTitle = article.category ? localizedTitle(article.category, locale) : undefined;
+const tagTitles = article.tags.map((tag) => localizedTitle(tag, locale));
+---
+
+<Layout
+  title={article.seoTitle || article.title}
+  description={article.seoDescription || article.excerpt}
+  image={shareImage}
+  type="article"
+  lang={article.language}
+  canonical={canonical}
+  alternates={alternates}
+  publishedAt={article.publishedAt}
+  updatedAt={article.updatedAt}
+  author={article.author}
+  imageAlt={article.socialImage?.alt || article.coverImage?.alt || article.title}
+  keywords={tagTitles}
+  articleSection={categoryTitle}
+  breadcrumbs={[
+    { name: locale === "fr" ? "Accueil" : "Home", url: "/" },
+    { name: copy.title, url: `/${locale}/blog` },
+    ...(article.category ? [{ name: categoryTitle!, url: `/${locale}/blog/category/${article.category.slug}` }] : []),
+    { name: article.title, url: articleUrl(article) },
+  ]}
+  bodyClass="article-page"
+>
+  <article class="article-layout" data-pagefind-body data-pagefind-filter={`language:${locale}`}>
+    <header class="article-header">
+      <div class="article-topline">
+        <a href={`/${locale}/blog`} class="back-link"><span aria-hidden="true">←</span> {copy.back}</a>
+        <nav class="language-switcher" aria-label={locale === "fr" ? "Changer de langue" : "Change language"}>
+          <span aria-current="page">{locale.toUpperCase()}</span>
+          {article.translation ? (
+            <a href={`/${translationLocale}/blog/${article.translation.slug}`}>{translationLocale.toUpperCase()}</a>
+          ) : (
+            <span title={copy.translationUnavailable} aria-label={copy.translationUnavailable}>{locale === "fr" ? "EN" : "FR"} · —</span>
+          )}
+        </nav>
+      </div>
+
+      {article.category && (
+        <a class="category-kicker" href={`/${locale}/blog/category/${article.category.slug}`}>{localizedTitle(article.category, locale)}</a>
+      )}
+      <h1 data-pagefind-meta="title">{article.title}</h1>
+      <p class="article-deck" data-pagefind-meta="description">{article.excerpt}</p>
+      <div class="article-dates">
+        <span>{article.author}</span>
+        <time datetime={article.publishedAt}>{copy.published} {formatBlogDate(article.publishedAt, locale)}</time>
+        {article.updatedAt && <time datetime={article.updatedAt}>{copy.updated} {formatBlogDate(article.updatedAt, locale)}</time>}
+      </div>
+      {article.tags.length > 0 && (
+        <div class="tag-list">{article.tags.map((tag) => <a href={`/${locale}/blog/tag/${tag.slug}`}>#{localizedTitle(tag, locale)}</a>)}</div>
+      )}
+    </header>
+
+    {article.coverImage?.asset?._ref && (
+      <figure class="article-cover">
+        <img src={imageUrl(article.coverImage.asset._ref, 1600)} alt={article.coverImage.alt || ""} width="1600" height="900" />
+        {article.coverImage.caption && <figcaption>{article.coverImage.caption}</figcaption>}
+      </figure>
+    )}
+
+    <div class="article-content-grid">
+      {headings.length > 0 && (
+        <aside class="table-of-contents">
+          <details open>
+            <summary>{copy.contents}</summary>
+            <ol>{headings.map((heading) => <li class={`toc-level-${heading.level}`}><a href={`#${heading.id}`}>{heading.text}</a></li>)}</ol>
+          </details>
+        </aside>
+      )}
+      <ArticleBody value={article.body} />
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="related-section" aria-labelledby="related-title">
+      <div class="section-heading"><h2 id="related-title">{copy.related}</h2></div>
+      <div class="article-grid compact">{related.map((item) => <ArticleCard article={item} locale={locale} />)}</div>
+    </section>
+  )}
+</Layout>

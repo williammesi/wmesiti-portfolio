@@ -6,6 +6,7 @@ import "../styles/global.css";
 
 interface Props extends SEOProps {
   bodyClass?: string;
+  pagefindIgnore?: boolean;
 }
 
 const {
@@ -15,12 +16,23 @@ const {
   url,
   type,
   noindex,
-  bodyClass = ""
+  lang = "fr-CA",
+  canonical,
+  alternates,
+  publishedAt,
+  updatedAt,
+  author,
+  imageAlt,
+  keywords,
+  articleSection,
+  breadcrumbs,
+  bodyClass = "",
+  pagefindIgnore = false,
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={lang}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -33,7 +45,16 @@ const {
 			url={url}
 			type={type}
 			noindex={noindex}
-			canonical={Astro.url.href}
+			canonical={canonical}
+			lang={lang}
+			alternates={alternates}
+			publishedAt={publishedAt}
+			updatedAt={updatedAt}
+			author={author}
+			imageAlt={imageAlt}
+			keywords={keywords}
+			articleSection={articleSection}
+			breadcrumbs={breadcrumbs}
 		/>
 
 		<!-- Fonts with optimized loading -->
@@ -42,19 +63,13 @@ const {
 			<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 		</noscript>
 
-		<!-- Performance optimizations -->
-		<link rel="modulepreload" href="/src/lib/sanity.ts" />
-
-		<!-- Web App Manifest -->
-		<link rel="manifest" href="/site.webmanifest" />
-
 		<!-- Critical CSS inlined in SEO component -->
 	</head>
-	<body class={`m-0 w-full h-full font-[montserrat] bg-mochablack text-mochawhite ${bodyClass}`}>
+	<body class={`m-0 w-full h-full font-[montserrat] bg-mochablack text-mochawhite ${bodyClass}`} data-pagefind-ignore={pagefindIgnore ? "" : undefined}>
 		<!-- Skip to main content for accessibility -->
-		<a href="#main-content" class="skip-link">Aller au contenu principal</a>
+		<a href="#main-content" class="skip-link">{lang === "en" ? "Skip to main content" : "Aller au contenu principal"}</a>
 
-		<Navbar />
+		<Navbar lang={lang} />
 
 		<main id="main-content" class="main-content">
 			<slot />
@@ -77,18 +92,6 @@ const {
 				});
 			}
 
-			// Service Worker registration (if available)
-			if ('serviceWorker' in navigator && import.meta.env.PROD) {
-				window.addEventListener('load', () => {
-					navigator.serviceWorker.register('/sw.js')
-						.then(registration => {
-							console.debug('SW registered: ', registration);
-						})
-						.catch(registrationError => {
-							console.debug('SW registration failed: ', registrationError);
-						});
-				});
-			}
 		</script>
 	</body>
 </html>

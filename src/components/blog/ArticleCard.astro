@@ -1,0 +1,24 @@
+---
+import type { ArticlePreview, BlogLocale } from "@/types/sanity";
+import { articleUrl, formatBlogDate, imageUrl, localizedTitle, locales } from "@/lib/blog";
+
+const { article, locale } = Astro.props as { article: ArticlePreview; locale: BlogLocale };
+const copy = locales[locale];
+const cover = imageUrl(article.coverImage?.asset?._ref, 900);
+---
+
+<article class:list={["article-card", { featured: article.featured }]}>
+  <a href={articleUrl(article)} class="card-link" aria-label={`${copy.read}: ${article.title}`}>
+    {cover && <img src={cover} alt={article.coverImage?.alt || ""} loading="lazy" width="900" height="506" />}
+    <div class="card-content">
+      <div class="card-meta">
+        {article.featured && <span class="featured-label">{copy.featured}</span>}
+        {article.category && <span>{localizedTitle(article.category, locale)}</span>}
+        <time datetime={article.publishedAt}>{formatBlogDate(article.publishedAt, locale)}</time>
+      </div>
+      <h2>{article.title}</h2>
+      <p>{article.excerpt}</p>
+      <span class="read-link">{copy.read} <span aria-hidden="true">→</span></span>
+    </div>
+  </a>
+</article>

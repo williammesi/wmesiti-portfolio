@@ -5,9 +5,9 @@ import { codeInput } from "@sanity/code-input";
 import { experience } from "./src/types/experience";
 import { project } from "./src/types/project";
 import { skillCategory } from "./src/types/skillcategory";
-import { blogCategory } from "./src/types/blogCategory";
-import { blogPost } from "./src/types/blogPost";
-import { weeklyLog } from "./src/types/weeklyLog";
+import { article } from "./src/types/article";
+import { articleCategory } from "./src/types/articleCategory";
+import { articleTag } from "./src/types/articleTag";
 
 export default defineConfig({
   name: "wmesiti-portfolio-cms",
@@ -16,6 +16,6 @@ export default defineConfig({
   dataset: "production",
   plugins: [structureTool(), visionTool(), codeInput()],
   schema: {
-    types: [experience, project, skillCategory, blogCategory, blogPost, weeklyLog],
+    types: [experience, project, skillCategory, article, articleCategory, articleTag],
   },
 });

@@ -1,0 +1,12 @@
+---
+import { headingId } from "@/lib/blog";
+import type { PortableTextBlock } from "@/types/sanity";
+
+const { node } = Astro.props as { node: PortableTextBlock };
+const Tag = (node.style || "h2") as "h2" | "h3" | "h4";
+const id = headingId(node);
+---
+
+<Tag id={id} class="article-heading group">
+  <a href={`#${id}`} aria-label={`Link to ${node.children.map((child) => child.text).join("")}`} class="heading-anchor"><slot /></a>
+</Tag>

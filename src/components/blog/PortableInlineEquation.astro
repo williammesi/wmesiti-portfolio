@@ -1,0 +1,7 @@
+---
+import katex from "katex";
+const { node } = Astro.props;
+const latex = String(node?.markDef?.latex || "");
+const rendered = katex.renderToString(latex, { displayMode: false, throwOnError: false, output: "htmlAndMathml" });
+---
+<span class="equation-inline" set:html={rendered} />

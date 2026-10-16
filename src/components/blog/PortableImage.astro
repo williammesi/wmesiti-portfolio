@@ -1,0 +1,14 @@
+---
+import { imageUrl } from "@/lib/blog";
+
+const { node } = Astro.props;
+const ref = node?.asset?._ref as string | undefined;
+const src = imageUrl(ref, 1400);
+---
+
+{src && (
+  <figure class="article-figure">
+    <img src={src} alt={node.alt || ""} loading="lazy" decoding="async" width="1400" />
+    {node.caption && <figcaption>{node.caption}</figcaption>}
+  </figure>
+)}
