@@ -1,0 +1,7 @@
+---
+import { localeFromLanguage } from "@/lib/blog";
+const { node } = Astro.props;
+const article = node?.markDef?.reference;
+const href = article?.slug && article?.language ? `/${localeFromLanguage(article.language)}/blog/${article.slug}` : "#";
+---
+<a href={href}><slot /></a>

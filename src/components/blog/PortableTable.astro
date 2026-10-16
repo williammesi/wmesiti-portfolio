@@ -1,0 +1,16 @@
+---
+const { node } = Astro.props;
+const rows = Array.isArray(node?.rows) ? node.rows : [];
+const header = node?.hasHeader !== false ? rows[0] : null;
+const bodyRows = header ? rows.slice(1) : rows;
+---
+
+<figure class="article-table">
+  <div class="table-scroll">
+    <table>
+      {header && <thead><tr>{header.cells?.map((cell: string) => <th scope="col">{cell}</th>)}</tr></thead>}
+      <tbody>{bodyRows.map((row: { cells?: string[] }) => <tr>{row.cells?.map((cell) => <td>{cell}</td>)}</tr>)}</tbody>
+    </table>
+  </div>
+  {node?.caption && <figcaption>{node.caption}</figcaption>}
+</figure>

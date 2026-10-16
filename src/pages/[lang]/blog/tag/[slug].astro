@@ -1,0 +1,33 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ArticleCard from "@/components/blog/ArticleCard.astro";
+import { queries, sanityFetch } from "@/lib/sanity";
+import { safeAsync } from "@/utils/errorHandling";
+import { absoluteUrl, languageFromLocale, locales, localizedTitle } from "@/lib/blog";
+import type { ArticlePreview, ArticleTaxonomy, BlogLocale } from "@/types/sanity";
+
+export const prerender = true;
+export async function getStaticPaths() {
+  const tags = await safeAsync(() => sanityFetch<ArticleTaxonomy[]>(queries.articleTags), []);
+  return ["fr", "en"].flatMap((lang) => tags.map((tag) => ({ params: { lang, slug: tag.slug } })));
+}
+
+const locale = Astro.params.lang as BlogLocale;
+const language = languageFromLocale(locale);
+if (!language) return Astro.redirect("/404");
+const [tags, allArticles] = await Promise.all([
+  safeAsync(() => sanityFetch<ArticleTaxonomy[]>(queries.articleTags), []),
+  safeAsync(() => sanityFetch<ArticlePreview[]>(queries.articlesByLanguage, { language }), []),
+]);
+const tag = tags.find((item) => item.slug === Astro.params.slug);
+if (!tag) return Astro.redirect("/404");
+const articles = allArticles.filter((article) => article.tags.some((item) => item.slug === tag.slug));
+const title = localizedTitle(tag, locale);
+---
+<Layout title={`#${title} — ${locales[locale].title}`} description={`${locale === "fr" ? "Articles étiquetés" : "Articles tagged"} ${title}`} lang={language} canonical={absoluteUrl(`/${locale}/blog/tag/${tag.slug}`)} pagefindIgnore>
+  <div class="blog-shell taxonomy-page">
+    <a href={`/${locale}/blog`} class="back-link">← {locales[locale].back}</a>
+    <header><p class="eyebrow">{locale === "fr" ? "Étiquette" : "Tag"}</p><h1>#{title}</h1></header>
+    {articles.length ? <div class="article-grid">{articles.map((article) => <ArticleCard article={article} locale={locale} />)}</div> : <div class="blog-empty"><p>{locales[locale].noArticles}</p></div>}
+  </div>
+</Layout>

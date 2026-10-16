@@ -1,0 +1,74 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ArticleCard from "@/components/blog/ArticleCard.astro";
+import BlogSearch from "@/components/blog/BlogSearch.astro";
+import { queries, sanityFetch } from "@/lib/sanity";
+import { safeAsync } from "@/utils/errorHandling";
+import { absoluteUrl, languageFromLocale, locales, localizedTitle } from "@/lib/blog";
+import type { ArticlePreview, ArticleTaxonomy, BlogLocale } from "@/types/sanity";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  return [{ params: { lang: "fr" } }, { params: { lang: "en" } }];
+}
+
+const locale = Astro.params.lang as BlogLocale;
+const language = languageFromLocale(locale);
+if (!language) return Astro.redirect("/404");
+
+const [articles, categories] = await Promise.all([
+  safeAsync(() => sanityFetch<ArticlePreview[]>(queries.articlesByLanguage, { language }), []),
+  safeAsync(() => sanityFetch<ArticleTaxonomy[]>(queries.articleCategories), []),
+]);
+const copy = locales[locale];
+---
+
+<Layout
+  title={`${copy.title} — William Mesiti`}
+  description={copy.intro}
+  lang={copy.language}
+  canonical={absoluteUrl(`/${locale}/blog`)}
+  alternates={[
+    { lang: "fr-CA", href: absoluteUrl("/fr/blog") },
+    { lang: "en", href: absoluteUrl("/en/blog") },
+    { lang: "x-default", href: absoluteUrl("/fr/blog") },
+  ]}
+>
+  <div class="blog-shell">
+    <header class="blog-hero">
+      <div>
+        <p class="eyebrow">William Mesiti · {locale === "fr" ? "Notes d'ingénierie" : "Engineering notes"}</p>
+        <h1>{copy.title}</h1>
+        <p>{copy.intro}</p>
+      </div>
+      <nav class="language-switcher" aria-label={locale === "fr" ? "Changer de langue" : "Change language"}>
+        <a href="/fr/blog" aria-current={locale === "fr" ? "page" : undefined}>FR</a>
+        <a href="/en/blog" aria-current={locale === "en" ? "page" : undefined}>EN</a>
+      </nav>
+    </header>
+
+    <BlogSearch locale={locale} />
+
+    {categories.length > 0 && (
+      <nav class="taxonomy-nav" aria-label={locale === "fr" ? "Catégories" : "Categories"}>
+        <span>{locale === "fr" ? "Explorer" : "Explore"}</span>
+        {categories.map((category) => (
+          <a href={`/${locale}/blog/category/${category.slug}`}>{localizedTitle(category, locale)}</a>
+        ))}
+      </nav>
+    )}
+
+    <section aria-labelledby="articles-heading">
+      <div class="section-heading">
+        <h2 id="articles-heading">{copy.allArticles}</h2>
+        <span>{articles.length.toString().padStart(2, "0")}</span>
+      </div>
+      {articles.length > 0 ? (
+        <div class="article-grid">{articles.map((article) => <ArticleCard article={article} locale={locale} />)}</div>
+      ) : (
+        <div class="blog-empty"><p>{copy.noArticles}</p></div>
+      )}
+    </section>
+  </div>
+</Layout>

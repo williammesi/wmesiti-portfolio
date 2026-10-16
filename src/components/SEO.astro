@@ -12,7 +12,12 @@ const {
   url = Astro.url.href,
   canonical = Astro.url.href,
   type = "website",
-  noindex = false
+  noindex = false,
+  lang = "fr-CA",
+  alternates = [],
+  publishedAt,
+  updatedAt,
+  author = "William Mesiti",
 } = Astro.props;
 
 // Site configuration
@@ -26,14 +31,14 @@ const fullCanonicalUrl = canonical.startsWith('http') ? canonical : `${siteUrl}$
 // Generate structured data
 const structuredData = {
   "@context": "https://schema.org",
-  "@type": type === "article" ? "Article" : "WebSite",
+  "@type": type === "article" ? "BlogPosting" : "WebSite",
   "name": title,
   "description": description,
   "url": fullCanonicalUrl,
   "image": fullImageUrl,
   "author": {
     "@type": "Person",
-    "name": "William Mesiti",
+    "name": author,
     "url": siteUrl,
     "jobTitle": "Développeur Full Stack",
     "sameAs": [
@@ -46,6 +51,13 @@ const structuredData = {
       "@type": "Person",
       "name": "William Mesiti"
     }
+  }),
+  ...(type === "article" && {
+    "headline": title,
+    "datePublished": publishedAt,
+    "dateModified": updatedAt || publishedAt,
+    "inLanguage": lang,
+    "mainEntityOfPage": fullCanonicalUrl,
   })
 };
 ---
@@ -54,11 +66,12 @@ const structuredData = {
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
-<meta name="author" content="William Mesiti" />
+<meta name="author" content={author} />
 <meta name="generator" content={Astro.generator} />
 
 <!-- Canonical URL -->
 <link rel="canonical" href={fullCanonicalUrl} />
+{alternates.map((alternate) => <link rel="alternate" hreflang={alternate.lang} href={alternate.href} />)}
 
 <!-- Robots -->
 {noindex && <meta name="robots" content="noindex, nofollow" />}
@@ -70,7 +83,9 @@ const structuredData = {
 <meta property="og:description" content={description} />
 <meta property="og:image" content={fullImageUrl} />
 <meta property="og:site_name" content={siteName} />
-<meta property="og:locale" content="fr_FR" />
+<meta property="og:locale" content={lang === "en" ? "en_US" : "fr_CA"} />
+{publishedAt && <meta property="article:published_time" content={publishedAt} />}
+{updatedAt && <meta property="article:modified_time" content={updatedAt} />}
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
@@ -105,13 +120,6 @@ const structuredData = {
 
 <!-- Favicons -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<link rel="manifest" href="/site.webmanifest" />
-
-<!-- Performance Hints -->
-<link rel="preload" href="/fonts/montserrat-variable.woff2" as="font" type="font/woff2" crossorigin />
 
 <style>
   /* Critical CSS for better perceived performance */

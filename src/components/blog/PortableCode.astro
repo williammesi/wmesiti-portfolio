@@ -1,0 +1,35 @@
+---
+import { codeToHtml } from "shiki";
+
+const { node } = Astro.props;
+const code = String(node?.code || "");
+const language = String(node?.language || "text");
+let highlighted: string;
+try {
+  highlighted = await codeToHtml(code, { lang: language, theme: "github-dark" });
+} catch {
+  highlighted = await codeToHtml(code, { lang: "text", theme: "github-dark" });
+}
+---
+
+<figure class="code-block" data-code-block>
+  <figcaption>
+    <span>{node?.filename || language}</span>
+    <button type="button" data-copy-code aria-label="Copy code">Copy</button>
+  </figcaption>
+  <div class="code-scroll" set:html={highlighted} />
+</figure>
+
+<script>
+  document.addEventListener("click", async (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-copy-code]");
+    if (!button) return;
+    const block = button.closest<HTMLElement>("[data-code-block]");
+    const code = block?.querySelector("code")?.textContent;
+    if (!code) return;
+    await navigator.clipboard.writeText(code);
+    const previous = button.textContent;
+    button.textContent = document.documentElement.lang === "en" ? "Copied" : "Copié";
+    window.setTimeout(() => { button.textContent = previous; }, 1600);
+  });
+</script>

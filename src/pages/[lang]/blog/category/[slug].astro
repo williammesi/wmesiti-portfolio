@@ -1,0 +1,34 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ArticleCard from "@/components/blog/ArticleCard.astro";
+import { queries, sanityFetch } from "@/lib/sanity";
+import { safeAsync } from "@/utils/errorHandling";
+import { absoluteUrl, languageFromLocale, locales, localizedDescription, localizedTitle } from "@/lib/blog";
+import type { ArticlePreview, ArticleTaxonomy, BlogLocale } from "@/types/sanity";
+
+export const prerender = true;
+export async function getStaticPaths() {
+  const categories = await safeAsync(() => sanityFetch<ArticleTaxonomy[]>(queries.articleCategories), []);
+  return ["fr", "en"].flatMap((lang) => categories.map((category) => ({ params: { lang, slug: category.slug } })));
+}
+
+const locale = Astro.params.lang as BlogLocale;
+const language = languageFromLocale(locale);
+if (!language) return Astro.redirect("/404");
+const [categories, allArticles] = await Promise.all([
+  safeAsync(() => sanityFetch<ArticleTaxonomy[]>(queries.articleCategories), []),
+  safeAsync(() => sanityFetch<ArticlePreview[]>(queries.articlesByLanguage, { language }), []),
+]);
+const category = categories.find((item) => item.slug === Astro.params.slug);
+if (!category) return Astro.redirect("/404");
+const articles = allArticles.filter((article) => article.category?.slug === category.slug);
+const title = localizedTitle(category, locale);
+const description = localizedDescription(category, locale) || (locale === "fr" ? `Articles dans ${title}` : `Articles in ${title}`);
+---
+<Layout title={`${title} — ${locales[locale].title}`} description={description} lang={language} canonical={absoluteUrl(`/${locale}/blog/category/${category.slug}`)} pagefindIgnore>
+  <div class="blog-shell taxonomy-page">
+    <a href={`/${locale}/blog`} class="back-link">← {locales[locale].back}</a>
+    <header><p class="eyebrow">{locale === "fr" ? "Catégorie" : "Category"}</p><h1>{title}</h1><p>{description}</p></header>
+    {articles.length ? <div class="article-grid">{articles.map((article) => <ArticleCard article={article} locale={locale} />)}</div> : <div class="blog-empty"><p>{locales[locale].noArticles}</p></div>}
+  </div>
+</Layout>

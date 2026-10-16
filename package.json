@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist/client && node scripts/copy-pagefind.mjs",
     "preview": "astro preview",
     "start": "node ./dist/server/entry.mjs",
     "astro": "astro"
@@ -28,13 +28,16 @@
     "astro-portabletext": "^0.11.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "katex": "^0.19.0",
     "lucide-vue-next": "^0.544.0",
+    "pagefind": "^1.5.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-is": "^19.1.1",
     "reka-ui": "^2.5.0",
     "sanity": "^5.7.0",
     "sharp": "^0.34.4",
+    "shiki": "^4.5.0",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
@@ -47,6 +50,7 @@
     "@iconify-json/ep": "^1.2.3",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify/vue": "^5.0.0",
+    "@types/katex": "^0.16.8",
     "astro-icon": "^1.1.5"
   },
   "overrides": {
