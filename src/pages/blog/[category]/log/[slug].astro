@@ -2,9 +2,12 @@
 import Layout from "../../../../layouts/Layout.astro";
 import { sanityFetch, queries } from "@/lib/sanity";
 import { safeAsync } from "@/utils/errorHandling";
-import { hasValidSession } from "@/lib/auth";
+import { isAuthenticated } from "@/lib/auth";
 import { PortableText } from "astro-portabletext";
 import type { WeeklyLog } from "@/types/sanity";
+
+// Disable prerendering
+export const prerender = false;
 
 // Get params
 const { category, slug } = Astro.params;
@@ -24,14 +27,9 @@ if (!weeklyLog) {
     return Astro.redirect(`/blog/${category}/${slug}`);
 }
 
-// Check if category is protected and validate session
+// Check if category is protected and redirect to login if not authenticated
 if (weeklyLog.category.isProtected) {
-    const isAuthenticated = await hasValidSession(
-        Astro.request,
-        category as string,
-    );
-
-    if (!isAuthenticated) {
+    if (!isAuthenticated(Astro.cookies, category as string)) {
         return Astro.redirect(`/blog/${category}/login`);
     }
 }

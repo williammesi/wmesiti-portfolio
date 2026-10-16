@@ -1,19 +1,27 @@
 /**
- * Authentication utilities for password-protected blog categories
- * Uses SHA-256 hashing for secure password storage and session cookies for browser auth
+ * Simple authentication for protected blog categories
+ * Uses password from Sanity + cookies for session management
  */
 
-// Hash a password using SHA-256 (Web Crypto API - works in both browser and Node.js/Vercel Edge)
+import type { AstroCookies } from "astro";
+
+const AUTH_COOKIE_NAME = "blog_auth";
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+
+/**
+ * Hash password using SHA-256 (matches Sanity's storage format)
+ */
 export async function hashPassword(password: string): Promise<string> {
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-    return hashHex;
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-// Verify a password against a stored hash
+/**
+ * Verify password against stored hash
+ */
 export async function verifyPassword(
     password: string,
     storedHash: string
@@ -22,144 +30,43 @@ export async function verifyPassword(
     return inputHash === storedHash;
 }
 
-// Cookie name for category authentication
-export function getAuthCookieName(categorySlug: string): string {
-    return `blog_auth_${categorySlug}`;
+/**
+ * Set authentication cookie for a specific category
+ */
+export function setAuthCookie(cookies: AstroCookies, categorySlug: string): void {
+    const cookieName = `${AUTH_COOKIE_NAME}_${categorySlug}`;
+    cookies.set(cookieName, "authenticated", {
+        path: "/",
+        httpOnly: true,
+        secure: import.meta.env.PROD,
+        sameSite: "lax",
+        maxAge: COOKIE_MAX_AGE,
+    });
 }
 
-// Create a signed session token for a category
-// Using a simple HMAC-like signature with the category slug and a timestamp
-export async function createSessionToken(categorySlug: string): Promise<string> {
-    const timestamp = Date.now().toString();
-    const payload = `${categorySlug}:${timestamp}`;
-
-    // Create a signature using the category slug as part of the key
-    // This is a simple approach - for production, use a proper secret key from env
-    const secret = import.meta.env.BLOG_AUTH_SECRET || "portfolio-blog-auth-2024";
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-        "raw",
-        encoder.encode(secret),
-        { name: "HMAC", hash: "SHA-256" },
-        false,
-        ["sign"]
-    );
-
-    const signature = await crypto.subtle.sign(
-        "HMAC",
-        key,
-        encoder.encode(payload)
-    );
-
-    const signatureHex = Array.from(new Uint8Array(signature))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-    // Token format: payload.signature (base64 encoded for safety)
-    const token = btoa(`${payload}:${signatureHex}`);
-    return token;
-}
-
-// Validate a session token
-export async function validateSessionToken(
-    token: string,
-    categorySlug: string
-): Promise<boolean> {
-    try {
-        const decoded = atob(token);
-        const [slug, timestamp, signature] = decoded.split(":");
-
-        // Check if the category matches
-        if (slug !== categorySlug) {
-            return false;
-        }
-
-        // Recreate the signature to verify
-        const payload = `${slug}:${timestamp}`;
-        const secret = import.meta.env.BLOG_AUTH_SECRET || "portfolio-blog-auth-2024";
-        const encoder = new TextEncoder();
-        const key = await crypto.subtle.importKey(
-            "raw",
-            encoder.encode(secret),
-            { name: "HMAC", hash: "SHA-256" },
-            false,
-            ["sign"]
-        );
-
-        const expectedSignature = await crypto.subtle.sign(
-            "HMAC",
-            key,
-            encoder.encode(payload)
-        );
-
-        const expectedHex = Array.from(new Uint8Array(expectedSignature))
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
-
-        return signature === expectedHex;
-    } catch {
-        return false;
-    }
-}
-
-// Check if the current request has a valid session for a category
-export async function hasValidSession(
-    request: Request,
-    categorySlug: string
-): Promise<boolean> {
-    const cookieHeader = request.headers.get("cookie");
-    if (!cookieHeader) {
-        return false;
-    }
-
-    const cookieName = getAuthCookieName(categorySlug);
-    const cookies = parseCookies(cookieHeader);
-    const token = cookies[cookieName];
-
-    if (!token) {
-        return false;
-    }
-
-    return validateSessionToken(token, categorySlug);
-}
-
-// Parse cookies from a cookie header string
-function parseCookies(cookieHeader: string): Record<string, string> {
-    const cookies: Record<string, string> = {};
-    const pairs = cookieHeader.split(";");
-
-    for (const pair of pairs) {
-        const [name, ...rest] = pair.trim().split("=");
-        if (name) {
-            cookies[name] = rest.join("=");
-        }
-    }
-
-    return cookies;
-}
-
-// Create a Set-Cookie header value for authentication
-// Session cookie (no Max-Age = expires when browser closes)
-export async function createAuthCookieHeader(
-    categorySlug: string
-): Promise<string> {
-    const token = await createSessionToken(categorySlug);
-    const cookieName = getAuthCookieName(categorySlug);
-
-    // Session cookie settings:
-    // - No Max-Age or Expires = session cookie (deleted when browser closes)
-    // - HttpOnly = not accessible via JavaScript
-    // - SameSite=Lax = CSRF protection while allowing navigation
-    // - Secure in production
+/**
+ * Generate Set-Cookie header string for manual Response creation
+ * (needed for Vercel compatibility with redirects)
+ */
+export function getAuthCookieHeader(categorySlug: string): string {
+    const cookieName = `${AUTH_COOKIE_NAME}_${categorySlug}`;
     const secure = import.meta.env.PROD ? "; Secure" : "";
-
-    return `${cookieName}=${token}; Path=/blog/${categorySlug}; HttpOnly; SameSite=Lax${secure}`;
+    return `${cookieName}=authenticated; Path=/; HttpOnly; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}${secure}`;
 }
 
-// Create a cookie header to clear authentication
-export function createLogoutCookieHeader(categorySlug: string): string {
-    const cookieName = getAuthCookieName(categorySlug);
-    const secure = import.meta.env.PROD ? "; Secure" : "";
+/**
+ * Check if user is authenticated for a specific category
+ */
+export function isAuthenticated(cookies: AstroCookies, categorySlug: string): boolean {
+    const cookieName = `${AUTH_COOKIE_NAME}_${categorySlug}`;
+    const authCookie = cookies.get(cookieName);
+    return authCookie?.value === "authenticated";
+}
 
-    return `${cookieName}=; Path=/blog/${categorySlug}; HttpOnly; SameSite=Lax${secure}; Max-Age=0`;
+/**
+ * Clear authentication cookie for a specific category
+ */
+export function clearAuthCookie(cookies: AstroCookies, categorySlug: string): void {
+    const cookieName = `${AUTH_COOKIE_NAME}_${categorySlug}`;
+    cookies.delete(cookieName, { path: "/" });
 }

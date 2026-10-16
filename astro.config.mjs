@@ -6,6 +6,7 @@ import icon from "astro-icon";
 import react from "@astrojs/react";
 import sanity from "@sanity/astro";
 import vercel from "@astrojs/vercel";
+import node from "@astrojs/node";
 // Removed @astrojs/sitemap - using custom sitemap.xml.ts instead for better SSR support
 
 // https://astro.build/config
@@ -114,17 +115,21 @@ export default defineConfig({
 
   // Server-side rendering configuration
   output: "server",
-  adapter: vercel({
-    // Vercel adapter optimizations
-    webAnalytics: {
-      enabled: true,
-    },
-    imageService: true,
-    isr: {
-      // Incremental Static Regeneration with shorter cache for content updates
-      expiration: 60, // 1 minute - content updates appear quickly
-    },
-  }),
+  // Use Node adapter for Railway, Vercel adapter for Vercel
+  // Switch based on environment or manually change before deployment
+  adapter: process.env.RAILWAY_ENVIRONMENT
+    ? node({ mode: "standalone" })
+    : vercel({
+        // Vercel adapter optimizations
+        webAnalytics: {
+          enabled: true,
+        },
+        imageService: true,
+        isr: {
+          // Incremental Static Regeneration with shorter cache for content updates
+          expiration: 60, // 1 minute - content updates appear quickly
+        },
+      }),
 
   // Image optimization
   image: {

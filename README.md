@@ -10,7 +10,7 @@ A modern, responsive portfolio website built with Astro 5, showcasing projects a
 - **Styling:** Tailwind CSS v4
 - **CMS:** Sanity Studio
 - **UI Components:** React & Vue
-- **Deployment:** Vercel
+- **Deployment:** Railway
 - **Icons:** Astro Icon with Material Design Icons
 
 ## ✨ Features
@@ -117,7 +117,7 @@ Un site portfolio moderne et réactif construit avec Astro 5, présentant des pr
 - **Stylisation:** Tailwind CSS v4
 - **CMS:** Sanity Studio
 - **Composants UI:** React & Vue
-- **Déploiement:** Vercel
+- **Déploiement:** Railway
 - **Icônes:** Astro Icon avec Material Design Icons
 
 ## ✨ Fonctionnalités
